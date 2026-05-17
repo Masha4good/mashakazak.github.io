@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UX-аудит флоу совместного счёта | Маша Казак</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-secondary: #f7f7f5;
+    --ink: #1a1a1a;
+    --ink-soft: #555;
+    --ink-muted: #999;
+    --accent: #2563eb;
+    --accent-bg: #eff6ff;
+    --line: #e8e8e4;
+    --radius: 12px;
+    --sans: 'Inter', -apple-system, sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 48px; height: 60px; background: rgba(255,255,255,0.92); backdrop-filter: blur(16px); border-bottom: 1px solid transparent; transition: border-color .2s; }
+  nav.scrolled { border-bottom-color: var(--line); }
+  .nav-logo { font-size: 15px; font-weight: 600; color: var(--ink); text-decoration: none; }
+  .nav-back { font-size: 13px; font-weight: 500; color: var(--ink-soft); text-decoration: none; transition: color .15s; }
+  .nav-back:hover { color: var(--ink); }
+  .btn { background: var(--ink); color: #fff !important; padding: 7px 16px; border-radius: 6px; font-size: 13px; font-weight: 500; text-decoration: none; transition: opacity .15s; }
+  .btn:hover { opacity: .8; }
+
+  .container { max-width: 780px; margin: 0 auto; padding: 0 48px; }
+  .container-wide { max-width: 1080px; margin: 0 auto; padding: 0 48px; }
+
+  .case-hero { padding: 120px 0 64px; border-bottom: 1px solid var(--line); }
+  .case-eyebrow { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 20px; opacity: 0; animation: fadeUp .5s ease forwards .1s; }
+  .case-hero h1 { font-size: clamp(32px,4.5vw,52px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 20px; opacity: 0; animation: fadeUp .5s ease forwards .2s; }
+  .case-hero-desc { font-size: 17px; line-height: 1.75; color: var(--ink-soft); margin-bottom: 40px; max-width: 600px; opacity: 0; animation: fadeUp .5s ease forwards .3s; }
+  .case-meta { display: flex; gap: 32px; flex-wrap: wrap; opacity: 0; animation: fadeUp .5s ease forwards .4s; }
+  .meta-item { display: flex; flex-direction: column; gap: 4px; }
+  .meta-label { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-muted); }
+  .meta-val { font-size: 14px; font-weight: 600; }
+
+  .task-nav { display: flex; gap: 8px; padding: 32px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .task-nav a { font-size: 13px; font-weight: 500; color: var(--ink-soft); text-decoration: none; padding: 6px 14px; border-radius: 6px; background: var(--bg-secondary); border: 1px solid var(--line); transition: all .15s; }
+  .task-nav a:hover { border-color: #ccc; color: var(--ink); }
+
+  .task-section { padding: 72px 0; border-bottom: 1px solid var(--line); }
+  .task-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 16px; }
+  .task-section h2 { font-size: clamp(24px,3vw,34px); font-weight: 700; letter-spacing: -0.025em; line-height: 1.2; margin-bottom: 20px; }
+  .task-section p { font-size: 15px; line-height: 1.75; color: var(--ink-soft); margin-bottom: 16px; }
+  .task-section p:last-child { margin-bottom: 0; }
+
+  .thinking { background: var(--bg-secondary); border-left: 3px solid var(--accent); border-radius: 0 var(--radius) var(--radius) 0; padding: 24px 28px; margin: 32px 0; }
+  .thinking-title { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
+  .thinking p { font-size: 14px; line-height: 1.75; color: var(--ink-soft); margin-bottom: 10px; }
+  .thinking p:last-child { margin-bottom: 0; }
+
+  /* FLOW MAP */
+  .flow-map { display: flex; align-items: center; gap: 0; margin: 32px 0; flex-wrap: wrap; }
+  .flow-step { background: var(--bg-secondary); border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; font-size: 12px; font-weight: 600; white-space: nowrap; position: relative; }
+  .flow-step.has-issue { border-color: #fca5a5; background: #fff5f5; color: #991b1b; }
+  .flow-arrow { font-size: 14px; color: var(--ink-muted); padding: 0 6px; flex-shrink: 0; }
+  .flow-legend { display: flex; gap: 20px; margin-top: 16px; flex-wrap: wrap; }
+  .flow-legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-soft); }
+  .flow-legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+
+  /* AUDIT ITEMS */
+  .audit-items { display: flex; flex-direction: column; gap: 24px; margin: 32px 0; }
+  .audit-item { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .audit-header { padding: 18px 24px; display: flex; align-items: flex-start; gap: 14px; background: var(--bg-secondary); border-bottom: 1px solid var(--line); }
+  .audit-num { width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .audit-header-text { flex: 1; }
+  .audit-screen { font-size: 11px; font-weight: 600; color: var(--ink-muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+  .audit-title { font-size: 15px; font-weight: 700; }
+  .audit-severity { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 4px; flex-shrink: 0; margin-top: 3px; }
+  .severity-high { background: #fff5f5; color: #991b1b; border: 1px solid #fecaca; }
+  .severity-mid { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
+  .severity-low { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
+
+  .audit-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 16px; }
+  .audit-problem { font-size: 14px; line-height: 1.7; color: var(--ink-soft); }
+  .audit-problem strong { color: var(--ink); }
+
+  .audit-ba { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .audit-before { background: #fff5f5; border: 1px solid #fecaca; border-radius: 8px; padding: 14px; }
+  .audit-after { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 14px; }
+  .audit-ba-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px; }
+  .audit-before .audit-ba-label { color: #991b1b; }
+  .audit-after .audit-ba-label { color: #166534; }
+  .audit-ba-text { font-size: 13px; line-height: 1.6; color: var(--ink-soft); }
+  .audit-ba-text strong { color: var(--ink); }
+  .audit-logic { font-size: 13px; line-height: 1.65; color: var(--accent); font-weight: 500; padding-top: 4px; }
+
+  /* SUMMARY */
+  .summary-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin: 32px 0; }
+  .summary-card { background: var(--bg-secondary); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; text-align: center; }
+  .summary-num { font-size: 36px; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 4px; }
+  .summary-num.red { color: #dc2626; }
+  .summary-num.orange { color: #ea580c; }
+  .summary-num.yellow { color: #ca8a04; }
+  .summary-label { font-size: 12px; color: var(--ink-soft); font-weight: 500; }
+
+  /* PROCESS */
+  .process-section { padding: 72px 0; }
+  .process-section h2 { font-size: clamp(24px,3vw,34px); font-weight: 700; letter-spacing: -0.025em; line-height: 1.2; margin-bottom: 40px; }
+  .process-items { display: flex; flex-direction: column; }
+  .process-item { display: grid; grid-template-columns: 200px 1fr; gap: 32px; padding: 32px 0; border-bottom: 1px solid var(--line); }
+  .process-item:last-child { border-bottom: none; }
+  .process-item-label { font-size: 14px; font-weight: 600; padding-top: 2px; }
+  .process-item-body { font-size: 14px; line-height: 1.75; color: var(--ink-soft); }
+  .process-item-body strong { color: var(--ink); font-weight: 600; }
+
+  .case-cta { padding: 64px 0; text-align: center; }
+  .case-cta p { font-size: 16px; color: var(--ink-soft); margin-bottom: 24px; }
+  .cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .cta-btn-primary { background: var(--ink); color: #fff; padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none; transition: opacity .15s; }
+  .cta-btn-primary:hover { opacity: .85; }
+  .cta-btn-secondary { background: var(--bg-secondary); border: 1px solid var(--line); color: var(--ink); padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none; transition: border-color .15s; }
+  .cta-btn-secondary:hover { border-color: #ccc; }
+
+  footer { padding: 48px 0; border-top: 1px solid var(--line); }
+  .footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; max-width: 1080px; margin: 0 auto; padding: 0 48px; }
+  .footer-name { font-size: 16px; font-weight: 700; letter-spacing: -0.02em; }
+  .footer-sub { font-size: 13px; color: var(--ink-muted); }
+  .footer-contacts { display: flex; gap: 20px; }
+  .footer-contact { font-size: 13px; font-weight: 500; color: var(--ink-soft); text-decoration: none; transition: color .15s; }
+  .footer-contact:hover { color: var(--ink); }
+
+  @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+  .reveal { opacity:0; transform:translateY(14px); transition: opacity .5s ease, transform .5s ease; }
+  .reveal.visible { opacity:1; transform:translateY(0); }
+
+  @media (max-width: 900px) {
+    nav { padding: 0 24px; }
+    .container, .container-wide { padding: 0 24px; }
+    .audit-ba { grid-template-columns: 1fr; }
+    .summary-grid { grid-template-columns: 1fr; }
+    .process-item { grid-template-columns: 1fr; gap: 12px; }
+    footer .footer-inner { padding: 0 24px; flex-direction: column; align-items: flex-start; }
+    .case-hero { padding: 100px 0 48px; }
+    .flow-map { gap: 4px; }
+  }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <a href="index.html" class="nav-logo">Маша Казак</a>
+  <a href="index.html#cases" class="nav-back">← Все кейсы</a>
+  <a href="https://t.me/mashakazak" class="btn">Написать</a>
+</nav>
+
+<!-- HERO -->
+<div class="case-hero">
+  <div class="container">
+    <div class="case-eyebrow">UX-аудит · B2C</div>
+    <h1>Флоу открытия совместного счёта: UX-аудит текстов</h1>
+    <p class="case-hero-desc">Тестовое задание: посмотреть флоу целиком как UX-редактор — найти проблемные места, объяснить логику и предложить исправления.</p>
+    <div class="case-meta">
+      <div class="meta-item">
+        <span class="meta-label">Формат</span>
+        <span class="meta-val">Тестовое задание</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Сценарий</span>
+        <span class="meta-val">Открытие совместного счёта</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Метод</span>
+        <span class="meta-val">UX-аудит текстов флоу</span>
+      </div>
+    </div>
+    <div class="task-nav">
+      <a href="#approach">Подход</a>
+      <a href="#flow">Флоу</a>
+      <a href="#audit">Находки</a>
+      <a href="#process">Разбор</a>
+    </div>
+  </div>
+</div>
+
+<!-- APPROACH -->
+<div class="task-section" id="approach">
+  <div class="container">
+    <div class="task-eyebrow reveal">Подход</div>
+    <h2 class="reveal">Как я смотрела на флоу</h2>
+    <p class="reveal">Совместный счёт — продукт с высокой эмоциональной нагрузкой. Пользователь делится финансами с другим человеком. Это требует доверия — и к продукту, и к другому участнику. Любая непонятность или тревожный текст на этом пути увеличивает риск, что человек уйдёт.</p>
+
+    <div class="thinking reveal">
+      <div class="thinking-title">На что я смотрела в первую очередь</div>
+      <p><strong>Понятность каждого шага.</strong> Пользователь должен в любой момент понимать: что сейчас происходит, что от него хотят и что будет дальше.</p>
+      <p><strong>Согласованность тона.</strong> Финансовый продукт требует спокойного и уверенного голоса. Если в одном месте текст звучит дружелюбно, а в другом — как юридический документ, это разрушает доверие.</p>
+      <p><strong>Критические точки.</strong> Подтверждение, ошибки, необратимые действия — там, где цена ошибки высока, текст должен быть особенно точным.</p>
+      <p><strong>Плейсхолдеры и незаполненные места.</strong> В макете много мест с «Title», «Text», «Subtitle» — это потенциальные точки потерь, которые нужно отметить.</p>
+    </div>
+  </div>
+</div>
+
+<!-- FLOW -->
+<div class="task-section" id="flow">
+  <div class="container">
+    <div class="task-eyebrow reveal">Флоу</div>
+    <h2 class="reveal">Структура сценария</h2>
+    <p class="reveal">Восстановила последовательность экранов из макета. Красным отмечены шаги с текстовыми проблемами.</p>
+
+    <div class="flow-map reveal">
+      <div class="flow-step">Вход в флоу</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step has-issue">Выбор участника</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step has-issue">Настройка карты</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step has-issue">Выбор типа карты</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step has-issue">Выбор дизайна карты участника</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step has-issue">Подтверждение</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">Счёт открыт</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step has-issue">Ошибка открытия</div>
+    </div>
+    <div class="flow-legend reveal">
+      <div class="flow-legend-item">
+        <div class="flow-legend-dot" style="background:#fca5a5; border:1px solid #fecaca;"></div>
+        Есть текстовые проблемы
+      </div>
+      <div class="flow-legend-item">
+        <div class="flow-legend-dot" style="background:var(--bg-secondary); border:1px solid var(--line);"></div>
+        Без замечаний
+      </div>
+    </div>
+
+    <div class="summary-grid reveal">
+      <div class="summary-card">
+        <div class="summary-num red">3</div>
+        <div class="summary-label">Критических проблемы</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-num orange">3</div>
+        <div class="summary-label">Средних проблемы</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-num yellow">2</div>
+        <div class="summary-label">Мелких замечания</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AUDIT -->
+<div class="task-section" id="audit">
+  <div class="container">
+    <div class="task-eyebrow reveal">Находки</div>
+    <h2 class="reveal">Что нашла и как исправить</h2>
+  </div>
+
+  <div class="container-wide">
+    <div class="audit-items reveal">
+
+      <!-- 1 -->
+      <div class="audit-item">
+        <div class="audit-header">
+          <div class="audit-num">1</div>
+          <div class="audit-header-text">
+            <div class="audit-screen">Экран выбора участника</div>
+            <div class="audit-title">Опечатка и неточная формулировка в подзаголовке</div>
+          </div>
+          <div class="audit-severity severity-high">Критично</div>
+        </div>
+        <div class="audit-body">
+          <div class="audit-problem">На экране выбора участника написано: <strong>«Выберите кто будет иметь доступ к счету. Можете пригласить позже из деталей счетв»</strong> — в слове «счетв» опечатка, которая попала в продакшн-макет. Кроме этого, «иметь доступ к счету» звучит технически и размыто — непонятно, что именно имеется в виду: видеть, тратить, управлять?</div>
+          <div class="audit-ba">
+            <div class="audit-before">
+              <div class="audit-ba-label">Было</div>
+              <div class="audit-ba-text">Выберите кто будет иметь доступ к счету. Можете пригласить позже из деталей счетв</div>
+            </div>
+            <div class="audit-after">
+              <div class="audit-ba-label">Стало</div>
+              <div class="audit-ba-text">Выберите, кому открыть доступ к совместному счёту. Добавить участников можно позже — в настройках счёта</div>
+            </div>
+          </div>
+          <div class="audit-logic">Исправила опечатку, добавила запятую после «Выберите», уточнила «доступ к совместному счёту» — теперь понятно о каком счёте речь. «Из деталей счёта» заменила на «в настройках счёта» — понятнее где искать.</div>
+        </div>
+      </div>
+
+      <!-- 2 -->
+      <div class="audit-item">
+        <div class="audit-header">
+          <div class="audit-num">2</div>
+          <div class="audit-header-text">
+            <div class="audit-screen">Экран настройки карты</div>
+            <div class="audit-title">Непонятно, чья карта настраивается — своя или участника</div>
+          </div>
+          <div class="audit-severity severity-high">Критично</div>
+        </div>
+        <div class="audit-body">
+          <div class="audit-problem">Заголовок <strong>«Настройте карту к совместному счету»</strong> появляется дважды — и для своей карты, и для карты участника. Пользователь не понимает, что именно он настраивает прямо сейчас. Это критично: решения для своей карты и для карты другого человека — разные по весу.</div>
+          <div class="audit-ba">
+            <div class="audit-before">
+              <div class="audit-ba-label">Было</div>
+              <div class="audit-ba-text">Настройте карту к совместному счету<br><br><em>(одинаковый заголовок для обоих экранов)</em></div>
+            </div>
+            <div class="audit-after">
+              <div class="audit-ba-label">Стало</div>
+              <div class="audit-ba-text">Для своей карты: <strong>Выберите карту для себя</strong><br><br>Для карты участника: <strong>Выберите карту для Андрея</strong></div>
+            </div>
+          </div>
+          <div class="audit-logic">Персонализация заголовка сразу снимает вопрос «чья это карта». Имя участника подтягивается из предыдущего шага — это не требует дополнительных данных от пользователя.</div>
+        </div>
+      </div>
+
+      <!-- 3 -->
+      <div class="audit-item">
+        <div class="audit-header">
+          <div class="audit-num">3</div>
+          <div class="audit-header-text">
+            <div class="audit-screen">Экран подтверждения</div>
+            <div class="audit-title">Незаконченный текст согласия перед действием</div>
+          </div>
+          <div class="audit-severity severity-high">Критично</div>
+        </div>
+        <div class="audit-body">
+          <div class="audit-problem">Перед финальной кнопкой написано: <strong>«Нажимая «Продолжить», вы соглашаетесь открыть совместный счет»</strong> — и на этом текст обрывается. Нет ссылки на условия, нет уточнения с кем открывается счёт. Это юридически уязвимо и тревожно для пользователя.</div>
+          <div class="audit-ba">
+            <div class="audit-before">
+              <div class="audit-ba-label">Было</div>
+              <div class="audit-ba-text">Нажимая «Продолжить», вы соглашаетесь открыть совместный счет</div>
+            </div>
+            <div class="audit-after">
+              <div class="audit-ba-label">Стало</div>
+              <div class="audit-ba-text">Нажимая «Продолжить», вы соглашаетесь открыть совместный счёт с Андреем Ивановым на условиях договора</div>
+            </div>
+          </div>
+          <div class="audit-logic">Добавила имя участника — пользователь видит с кем открывает счёт. «На условиях договора» — минимальная юридическая ссылка, которую можно сделать кликабельной. Это стандарт для финансовых продуктов.</div>
+        </div>
+      </div>
+
+      <!-- 4 -->
+      <div class="audit-item">
+        <div class="audit-header">
+          <div class="audit-num">4</div>
+          <div class="audit-header-text">
+            <div class="audit-screen">Экран выбора дизайна карты участника</div>
+            <div class="audit-title">Важное ограничение спрятано в подписи</div>
+          </div>
+          <div class="audit-severity severity-mid">Средне</div>
+        </div>
+        <div class="audit-body">
+          <div class="audit-problem">На экране выбора дизайна карты для участника есть важная оговорка: <strong>«Выбрать бесплатную металлическую карту можно кому-то одному: либо себе, либо близкому»</strong>. Это ключевое ограничение, которое влияет на решение. Но оно написано мелким текстом под карточками — пользователь может его пропустить и выбрать металлическую карту участнику, не зная что потеряет бесплатную для себя.</div>
+          <div class="audit-ba">
+            <div class="audit-before">
+              <div class="audit-ba-label">Было</div>
+              <div class="audit-ba-text">Выбрать бесплатную металлическую карту можно кому-то одному: либо себе, либо близкому<br><em>(мелкий текст под карточками)</em></div>
+            </div>
+            <div class="audit-after">
+              <div class="audit-ba-label">Стало</div>
+              <div class="audit-ba-text">Вынести в подзаголовок экрана: <strong>Одна бесплатная металлическая карта — вам или Андрею на выбор</strong></div>
+            </div>
+          </div>
+          <div class="audit-logic">Ограничение нужно показывать до выбора, а не после. Если пользователь выберет металлическую для участника и только потом прочитает оговорку — это вызовет раздражение. Вынос в подзаголовок делает ограничение частью контекста выбора.</div>
+        </div>
+      </div>
+
+      <!-- 5 -->
+      <div class="audit-item">
+        <div class="audit-header">
+          <div class="audit-num">5</div>
+          <div class="audit-header-text">
+            <div class="audit-screen">Экран ошибки открытия</div>
+            <div class="audit-title">Непонятная альтернатива в сообщении об ошибке</div>
+          </div>
+          <div class="audit-severity severity-mid">Средне</div>
+        </div>
+        <div class="audit-body">
+          <div class="audit-problem">При ошибке открытия написано: <strong>«Не удалось открыть совместный счет с Андреем Ивановым. Попробуйте через полчаса или просто дайте доступ к своей карте Black»</strong>. Второй вариант — «дайте доступ к карте Black» — звучит как случайная альтернатива. Непонятно, что это означает, зачем это делать и как это связано с совместным счётом.</div>
+          <div class="audit-ba">
+            <div class="audit-before">
+              <div class="audit-ba-label">Было</div>
+              <div class="audit-ba-text">Не удалось открыть совместный счет с Андреем Ивановым. Попробуйте через полчаса или просто дайте доступ к своей карте Black</div>
+            </div>
+            <div class="audit-after">
+              <div class="audit-ba-label">Стало</div>
+              <div class="audit-ba-text">Не получилось открыть совместный счёт. Попробуйте позже — или напишите в поддержку, разберёмся вместе</div>
+            </div>
+          </div>
+          <div class="audit-logic">Убрала непонятную альтернативу про карту Black — если это отдельный продукт, его стоит предлагать в другом контексте, не в ошибке. Заменила на понятное действие: поддержка. «Разберёмся вместе» снимает тревогу — человек не остаётся один с проблемой.</div>
+        </div>
+      </div>
+
+      <!-- 6 -->
+      <div class="audit-item">
+        <div class="audit-header">
+          <div class="audit-num">6</div>
+          <div class="audit-header-text">
+            <div class="audit-screen">Экран лимитов карты</div>
+            <div class="audit-title">«Без ограничений» повторяется три раза подряд</div>
+          </div>
+          <div class="audit-severity severity-mid">Средне</div>
+        </div>
+        <div class="audit-body">
+          <div class="audit-problem">На экране настройки лимитов значение <strong>«Без ограничений»</strong> встречается три раза — как будто это три отдельных пункта с одинаковым ответом. Это создаёт визуальный шум и вопрос: зачем повторять одно и то же?</div>
+          <div class="audit-ba">
+            <div class="audit-before">
+              <div class="audit-ba-label">Было</div>
+              <div class="audit-ba-text">Без ограничений<br>Без ограничений<br>Без ограничений<br><em>(три раза подряд)</em></div>
+            </div>
+            <div class="audit-after">
+              <div class="audit-ba-label">Стало</div>
+              <div class="audit-ba-text">Уточнить у продакта: это три разных параметра (траты в день, в месяц, за операцию) или один? Если разные — подписать каждый. Если один — оставить одно значение.</div>
+            </div>
+          </div>
+          <div class="audit-logic">Это вопрос к логике продукта, а не только к тексту. Редактор не должен молча оставлять три одинаковых строки — нужно разобраться, что за ними стоит.</div>
+        </div>
+      </div>
+
+      <!-- 7 -->
+      <div class="audit-item">
+        <div class="audit-header">
+          <div class="audit-num">7</div>
+          <div class="audit-header-text">
+            <div class="audit-screen">Успешный финальный экран</div>
+            <div class="audit-title">Хороший экран — но можно усилить</div>
+          </div>
+          <div class="audit-severity severity-low">Мелко</div>
+        </div>
+        <div class="audit-body">
+          <div class="audit-problem">Финальный экран: <strong>«Совместный счет с Андреем Ивановым открыт. Отдельный счет для общих трат с родственниками, друзьями и близкими»</strong>. Первая строка хорошая — конкретная и с именем. Вторая — маркетинговый подзаголовок, который объясняет что такое совместный счёт. Но пользователь только что его открыл — он уже знает. Это место занял бы лучше следующий шаг.</div>
+          <div class="audit-ba">
+            <div class="audit-before">
+              <div class="audit-ba-label">Было</div>
+              <div class="audit-ba-text">Совместный счет с Андреем Ивановым открыт<br>Отдельный счет для общих трат с родственниками, друзьями и близкими</div>
+            </div>
+            <div class="audit-after">
+              <div class="audit-ba-label">Стало</div>
+              <div class="audit-ba-text">Совместный счёт с Андреем Ивановым открыт<br>Пополните счёт — и Андрей сможет начать им пользоваться</div>
+            </div>
+          </div>
+          <div class="audit-logic">Подзаголовок на финальном экране лучше использовать для следующего действия. Пользователь открыл счёт — что дальше? Пополнить, пригласить, выпустить карту. Подсказка про следующий шаг увеличивает вовлечённость.</div>
+        </div>
+      </div>
+
+      <!-- 8 -->
+      <div class="audit-item">
+        <div class="audit-header">
+          <div class="audit-num">8</div>
+          <div class="audit-header-text">
+            <div class="audit-screen">Весь флоу</div>
+            <div class="audit-title">Плейсхолдеры в продакшн-макете</div>
+          </div>
+          <div class="audit-severity severity-low">Мелко</div>
+        </div>
+        <div class="audit-body">
+          <div class="audit-problem">В макете много незаполненных мест: <strong>«Title», «Text», «Subtitle», «Screen subheader», «Replace me», «Label»</strong>. Это нормально для дизайна на ранней стадии, но перед передачей задачи редактору стоит отметить, какие из них нужно заполнить в рамках задания, а какие — технические заглушки.</div>
+          <div class="audit-ba">
+            <div class="audit-before">
+              <div class="audit-ba-label">Было</div>
+              <div class="audit-ba-text">Title, Text, Subtitle, Replace me — без контекста что здесь должно быть</div>
+            </div>
+            <div class="audit-after">
+              <div class="audit-ba-label">Стало</div>
+              <div class="audit-ba-text">Уточнить у дизайнера: какие плейсхолдеры требуют реального текста, а какие — технические элементы макета. Заполнить первые, отметить вторые.</div>
+            </div>
+          </div>
+          <div class="audit-logic">Редактор не должен угадывать, что скрывается за «Replace me». Это вопрос к дизайнеру или продакту — лучше задать его явно, чем придумать текст не в том месте.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- PROCESS -->
+<div class="process-section" id="process">
+  <div class="container">
+    <div class="task-eyebrow reveal">Разбор</div>
+    <h2 class="reveal">Как я работала с флоу</h2>
+    <div class="process-items reveal">
+      <div class="process-item">
+        <div class="process-item-label">Сначала — контекст продукта</div>
+        <div class="process-item-body">
+          Совместный счёт — продукт с высоким доверительным барьером. Прежде чем смотреть на тексты, я представила себя пользователем: <strong>что я знаю о продукте до входа во флоу, что меня тревожит, какие вопросы у меня возникают на каждом шаге.</strong> Это помогает находить не только ошибки, но и пробелы в логике.
+        </div>
+      </div>
+      <div class="process-item">
+        <div class="process-item-label">Классифицировала по критичности</div>
+        <div class="process-item-body">
+          Не все проблемы одинаковы. <strong>Опечатка в юридическом тексте и неудачный подзаголовок — разные по весу.</strong> Я разделила находки на критичные (влияют на понимание и доверие), средние (создают путаницу) и мелкие (можно улучшить, но не срочно). Это помогает команде расставить приоритеты.
+        </div>
+      </div>
+      <div class="process-item">
+        <div class="process-item-label">Объясняла логику каждого решения</div>
+        <div class="process-item-body">
+          Редактор — не корректор. <strong>Мало сказать «здесь плохо» — важно объяснить почему и что именно не работает.</strong> К каждой находке я написала: в чём проблема, как исправить и почему именно так. Это делает аудит полезным инструментом для команды, а не списком замечаний.
+        </div>
+      </div>
+      <div class="process-item">
+        <div class="process-item-label">Задавала вопросы там, где нужен контекст</div>
+        <div class="process-item-body">
+          Некоторые проблемы нельзя исправить без уточнений у продакта или дизайнера. <strong>Честнее задать вопрос, чем придумать текст вслепую.</strong> Плейсхолдеры «Replace me», три одинаковых «Без ограничений», непонятная альтернатива в ошибке — всё это требует уточнений прежде чем писать финальный текст.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="case-cta">
+  <div class="container">
+    <p>Понравился кейс? Посмотрите другие работы или напишите мне</p>
+    <div class="cta-btns">
+      <a href="index.html#cases" class="cta-btn-secondary">Все кейсы</a>
+      <a href="https://t.me/mashakazak" class="cta-btn-primary">Написать в Telegram</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-name">Маша Казак</div>
+      <div class="footer-sub">UX-редактор · Москва</div>
+    </div>
+    <div class="footer-contacts">
+      <a href="mailto:Cassaque@gmail.com" class="footer-contact">Cassaque@gmail.com</a>
+      <a href="https://t.me/mashakazak" class="footer-contact">@mashakazak</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 10));
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+  }, { threshold: 0.07 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
