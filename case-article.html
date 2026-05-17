@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Продуктовая статья: как начать инвестировать | Маша Казак</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-secondary: #f7f7f5;
+    --ink: #1a1a1a;
+    --ink-soft: #555;
+    --ink-muted: #999;
+    --accent: #2563eb;
+    --accent-bg: #eff6ff;
+    --line: #e8e8e4;
+    --radius: 12px;
+    --sans: 'Inter', -apple-system, sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+
+  /* NAV */
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 48px; height: 60px; background: rgba(255,255,255,0.92); backdrop-filter: blur(16px); border-bottom: 1px solid transparent; transition: border-color .2s; }
+  nav.scrolled { border-bottom-color: var(--line); }
+  .nav-logo { font-size: 15px; font-weight: 600; color: var(--ink); text-decoration: none; }
+  .nav-back { font-size: 13px; font-weight: 500; color: var(--ink-soft); text-decoration: none; display: flex; align-items: center; gap: 6px; transition: color .15s; }
+  .nav-back:hover { color: var(--ink); }
+  .btn { background: var(--ink); color: #fff !important; padding: 7px 16px; border-radius: 6px; font-size: 13px; font-weight: 500; text-decoration: none; transition: opacity .15s; }
+  .btn:hover { opacity: .8; }
+
+  /* LAYOUT */
+  .container { max-width: 780px; margin: 0 auto; padding: 0 48px; }
+  .container-wide { max-width: 1080px; margin: 0 auto; padding: 0 48px; }
+
+  /* HERO */
+  .case-hero { padding: 120px 0 64px; border-bottom: 1px solid var(--line); }
+  .case-eyebrow { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 20px; opacity: 0; animation: fadeUp .5s ease forwards .1s; }
+  .case-hero h1 { font-size: clamp(32px,4.5vw,52px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 20px; opacity: 0; animation: fadeUp .5s ease forwards .2s; }
+  .case-hero-desc { font-size: 17px; line-height: 1.75; color: var(--ink-soft); margin-bottom: 40px; max-width: 600px; opacity: 0; animation: fadeUp .5s ease forwards .3s; }
+  .case-meta { display: flex; gap: 32px; flex-wrap: wrap; opacity: 0; animation: fadeUp .5s ease forwards .4s; }
+  .meta-item { display: flex; flex-direction: column; gap: 4px; }
+  .meta-label { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-muted); }
+  .meta-val { font-size: 14px; font-weight: 600; }
+
+  /* TASK NAV */
+  .task-nav { display: flex; gap: 8px; padding: 32px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .task-nav a { font-size: 13px; font-weight: 500; color: var(--ink-soft); text-decoration: none; padding: 6px 14px; border-radius: 6px; background: var(--bg-secondary); border: 1px solid var(--line); transition: all .15s; }
+  .task-nav a:hover { border-color: #ccc; color: var(--ink); }
+
+  /* SECTIONS */
+  .task-section { padding: 72px 0; border-bottom: 1px solid var(--line); }
+  .task-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 16px; }
+  .task-section h2 { font-size: clamp(24px,3vw,34px); font-weight: 700; letter-spacing: -0.025em; line-height: 1.2; margin-bottom: 20px; }
+  .task-section p { font-size: 15px; line-height: 1.75; color: var(--ink-soft); margin-bottom: 16px; }
+
+  /* THINKING */
+  .thinking { background: var(--bg-secondary); border-left: 3px solid var(--accent); border-radius: 0 var(--radius) var(--radius) 0; padding: 24px 28px; margin: 32px 0; }
+  .thinking-title { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
+  .thinking p { font-size: 14px; line-height: 1.75; color: var(--ink-soft); margin-bottom: 10px; }
+  .thinking p:last-child { margin-bottom: 0; }
+
+  /* BRIEF */
+  .brief-card { background: var(--bg-secondary); border: 1px solid var(--line); border-radius: var(--radius); padding: 32px; margin: 32px 0; }
+  .brief-title { font-size: 16px; font-weight: 700; margin-bottom: 20px; }
+  .brief-items { display: flex; flex-direction: column; gap: 14px; }
+  .brief-item { display: grid; grid-template-columns: 140px 1fr; gap: 16px; font-size: 14px; }
+  .brief-key { font-weight: 600; color: var(--ink-muted); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; padding-top: 2px; }
+  .brief-val { color: var(--ink-soft); line-height: 1.6; }
+  .brief-val strong { color: var(--ink); font-weight: 600; }
+
+  /* AUDIENCE */
+  .audience-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin: 32px 0; }
+  .audience-card { background: var(--bg-secondary); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; }
+  .audience-icon { font-size: 24px; margin-bottom: 12px; }
+  .audience-name { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .audience-desc { font-size: 13px; line-height: 1.6; color: var(--ink-soft); }
+
+  /* STRUCTURE */
+  .structure-items { display: flex; flex-direction: column; gap: 0; margin: 32px 0; }
+  .structure-item { display: grid; grid-template-columns: 48px 1fr; gap: 20px; padding: 24px 0; border-bottom: 1px solid var(--line); }
+  .structure-item:last-child { border-bottom: none; }
+  .structure-num { width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+  .structure-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .structure-desc { font-size: 13px; line-height: 1.65; color: var(--ink-soft); }
+  .structure-note { font-size: 12px; color: var(--accent); font-weight: 500; margin-top: 8px; }
+
+  /* ARTICLE PREVIEW */
+  .article-preview {
+    background: var(--bg-secondary); border: 1px solid var(--line); border-radius: var(--radius);
+    overflow: hidden; margin: 40px 0;
+  }
+  .article-header {
+    padding: 32px 40px 24px; border-bottom: 1px solid var(--line);
+    background: #fff;
+  }
+  .article-tag { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+  .article-title { font-size: clamp(22px,3vw,32px); font-weight: 700; letter-spacing: -0.025em; line-height: 1.2; margin-bottom: 12px; }
+  .article-lead { font-size: 16px; line-height: 1.75; color: var(--ink-soft); margin-bottom: 20px; }
+  .article-meta { display: flex; gap: 20px; flex-wrap: wrap; }
+  .article-meta-item { font-size: 12px; color: var(--ink-muted); font-weight: 500; }
+  .article-body { padding: 32px 40px; }
+  .article-body h3 { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; margin: 28px 0 12px; }
+  .article-body h3:first-child { margin-top: 0; }
+  .article-body p { font-size: 14px; line-height: 1.8; color: var(--ink-soft); margin-bottom: 14px; }
+  .article-body p:last-child { margin-bottom: 0; }
+
+  /* CALLOUT */
+  .callout { background: var(--accent-bg); border: 1px solid #bfdbfe; border-radius: 10px; padding: 18px 20px; margin: 20px 0; }
+  .callout-title { font-size: 12px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
+  .callout p { font-size: 13px; line-height: 1.65; color: #1e40af; margin: 0; }
+
+  .callout.green { background: #f0fdf4; border-color: #bbf7d0; }
+  .callout.green .callout-title { color: #166534; }
+  .callout.green p { color: #166534; }
+
+  .callout.yellow { background: #fffbeb; border-color: #fde68a; }
+  .callout.yellow .callout-title { color: #92400e; }
+  .callout.yellow p { color: #78350f; }
+
+  /* STEPS LIST */
+  .steps-list { display: flex; flex-direction: column; gap: 12px; margin: 16px 0; }
+  .step-item { display: flex; gap: 12px; align-items: flex-start; }
+  .step-dot { width: 22px; height: 22px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .step-text { font-size: 14px; line-height: 1.65; color: var(--ink-soft); }
+  .step-text strong { color: var(--ink); }
+
+  /* COMPARISON */
+  .comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
+  .comp-card { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 18px; }
+  .comp-title { font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+  .comp-items { display: flex; flex-direction: column; gap: 6px; }
+  .comp-item { display: flex; gap: 8px; font-size: 12px; color: var(--ink-soft); align-items: flex-start; line-height: 1.4; }
+  .comp-item::before { content: ''; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+  .comp-card.pros .comp-item::before { background: #22c55e; }
+  .comp-card.cons .comp-item::before { background: #f87171; }
+
+  /* BEFORE/AFTER */
+  .ba-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 32px 0; }
+  .ba-card { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .ba-label { padding: 10px 16px; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+  .ba-card.before .ba-label { background: #fff5f5; color: #991b1b; }
+  .ba-card.after .ba-label { background: #f0fdf4; color: #166534; }
+  .ba-body { padding: 16px; font-size: 13px; line-height: 1.65; color: var(--ink-soft); }
+  .ba-note { font-size: 12px; color: var(--accent); font-weight: 500; padding: 10px 16px; border-top: 1px solid var(--line); background: var(--bg-secondary); }
+
+  /* PROCESS */
+  .process-section { padding: 72px 0; }
+  .process-section h2 { font-size: clamp(24px,3vw,34px); font-weight: 700; letter-spacing: -0.025em; line-height: 1.2; margin-bottom: 40px; }
+  .process-items { display: flex; flex-direction: column; }
+  .process-item { display: grid; grid-template-columns: 200px 1fr; gap: 32px; padding: 32px 0; border-bottom: 1px solid var(--line); }
+  .process-item:last-child { border-bottom: none; }
+  .process-item-label { font-size: 14px; font-weight: 600; padding-top: 2px; }
+  .process-item-body { font-size: 14px; line-height: 1.75; color: var(--ink-soft); }
+  .process-item-body strong { color: var(--ink); font-weight: 600; }
+
+  /* CTA */
+  .case-cta { padding: 64px 0; text-align: center; }
+  .case-cta p { font-size: 16px; color: var(--ink-soft); margin-bottom: 24px; }
+  .cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .cta-btn-primary { background: var(--ink); color: #fff; padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none; transition: opacity .15s; }
+  .cta-btn-primary:hover { opacity: .85; }
+  .cta-btn-secondary { background: var(--bg-secondary); border: 1px solid var(--line); color: var(--ink); padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none; transition: border-color .15s; }
+  .cta-btn-secondary:hover { border-color: #ccc; }
+
+  /* FOOTER */
+  footer { padding: 48px 0; border-top: 1px solid var(--line); }
+  .footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; max-width: 1080px; margin: 0 auto; padding: 0 48px; }
+  .footer-name { font-size: 16px; font-weight: 700; letter-spacing: -0.02em; }
+  .footer-sub { font-size: 13px; color: var(--ink-muted); }
+  .footer-contacts { display: flex; gap: 20px; flex-wrap: wrap; }
+  .footer-contact { font-size: 13px; font-weight: 500; color: var(--ink-soft); text-decoration: none; transition: color .15s; }
+  .footer-contact:hover { color: var(--ink); }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+  .reveal { opacity:0; transform:translateY(14px); transition: opacity .5s ease, transform .5s ease; }
+  .reveal.visible { opacity:1; transform:translateY(0); }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    nav { padding: 0 24px; }
+    .container, .container-wide { padding: 0 24px; }
+    .audience-grid { grid-template-columns: 1fr; }
+    .comparison { grid-template-columns: 1fr; }
+    .ba-grid { grid-template-columns: 1fr; }
+    .process-item { grid-template-columns: 1fr; gap: 12px; }
+    .brief-item { grid-template-columns: 1fr; gap: 4px; }
+    .article-header, .article-body { padding: 24px; }
+    footer .footer-inner { padding: 0 24px; flex-direction: column; align-items: flex-start; }
+    .case-hero { padding: 100px 0 48px; }
+    .structure-item { grid-template-columns: 36px 1fr; gap: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <a href="index.html" class="nav-logo">Маша Казак</a>
+  <a href="index.html#cases" class="nav-back">← Все кейсы</a>
+  <a href="https://t.me/mashakazak" class="btn">Написать</a>
+</nav>
+
+<!-- HERO -->
+<div class="case-hero">
+  <div class="container">
+    <div class="case-eyebrow">Продуктовая статья</div>
+    <h1>Как начать инвестировать:<br>статья для банковского приложения</h1>
+    <p class="case-hero-desc">Тестовое задание: написать продуктовую статью-руководство для раздела «Инвестиции» в мобильном банке. Аудитория — пользователи без опыта, которые впервые думают о вложениях.</p>
+    <div class="case-meta">
+      <div class="meta-item">
+        <span class="meta-label">Формат</span>
+        <span class="meta-val">Тестовое задание</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Жанр</span>
+        <span class="meta-val">Статья-руководство</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Размещение</span>
+        <span class="meta-val">Мобильное приложение банка</span>
+      </div>
+    </div>
+    <div class="task-nav">
+      <a href="#brief">Задание</a>
+      <a href="#audience">Аудитория</a>
+      <a href="#structure">Структура</a>
+      <a href="#article">Статья</a>
+      <a href="#choices">Редакторские решения</a>
+      <a href="#process">Разбор</a>
+    </div>
+  </div>
+</div>
+
+<!-- BRIEF -->
+<div class="task-section" id="brief">
+  <div class="container">
+    <div class="task-eyebrow reveal">Задание</div>
+    <h2 class="reveal">Что нужно было сделать</h2>
+    <p class="reveal">Команда запускает раздел «Инвестиции» в мобильном приложении. Нужна вводная статья для пользователей, которые ничего не знают об инвестициях, но хотят попробовать. Статья должна снять страх, объяснить базу и подтолкнуть к первому шагу — прямо в приложении.</p>
+
+    <div class="brief-card reveal">
+      <div class="brief-title">Бриф от команды</div>
+      <div class="brief-items">
+        <div class="brief-item">
+          <div class="brief-key">Задача</div>
+          <div class="brief-val"><strong>Написать статью-руководство</strong> «Как начать инвестировать» для раздела обучения в приложении.</div>
+        </div>
+        <div class="brief-item">
+          <div class="brief-key">Аудитория</div>
+          <div class="brief-val">Пользователи банка 25–45 лет. Доход средний и выше среднего. Слышали об инвестициях, но никогда не пробовали. Главный страх — потерять деньги.</div>
+        </div>
+        <div class="brief-item">
+          <div class="brief-key">Цель статьи</div>
+          <div class="brief-val">После прочтения пользователь должен понять базовые принципы и сделать первое действие в приложении — открыть брокерский счёт или пополнить его.</div>
+        </div>
+        <div class="brief-item">
+          <div class="brief-key">Ограничения</div>
+          <div class="brief-val">Без сложных терминов без объяснения. Без обещания доходности. Объём — до 1500 слов. Тон — дружелюбный, без менторства.</div>
+        </div>
+        <div class="brief-item">
+          <div class="brief-key">CTA</div>
+          <div class="brief-val">В конце — призыв к действию, который ведёт в приложение.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AUDIENCE -->
+<div class="task-section" id="audience">
+  <div class="container">
+    <div class="task-eyebrow reveal">Аудитория</div>
+    <h2 class="reveal">Кто читает эту статью</h2>
+    <p class="reveal">Прежде чем писать — я определила три портрета читателя. У каждого своя точка входа и свой главный вопрос.</p>
+
+    <div class="audience-grid reveal">
+      <div class="audience-card">
+        <div class="audience-icon">😟</div>
+        <div class="audience-name">«Боюсь потерять»</div>
+        <div class="audience-desc">Откладывает на вкладе или просто на карте. Слышал про инвестиции, но кажется, что это «для богатых» или «слишком рискованно». Нужно снять страх и показать, что можно начать с малого.</div>
+      </div>
+      <div class="audience-card">
+        <div class="audience-icon">🤷</div>
+        <div class="audience-name">«Не знаю с чего начать»</div>
+        <div class="audience-desc">Хочет попробовать, но не понимает механику. Акции? Облигации? Фонды? Всё звучит непонятно. Нужен чёткий первый шаг без перегруза терминами.</div>
+      </div>
+      <div class="audience-card">
+        <div class="audience-icon">💼</div>
+        <div class="audience-name">«Уже думал, но откладывал»</div>
+        <div class="audience-desc">Читал про инвестиции, даже скачивал приложения. Но так и не начал — не хватило последнего толчка. Нужен конкретный призыв к действию прямо сейчас.</div>
+      </div>
+    </div>
+
+    <div class="thinking reveal">
+      <div class="thinking-title">Как персоны влияют на текст</div>
+      <p>Все три портрета объединяет одно: они не знают, с чего начать, и боятся ошибиться. Значит, статья должна снимать тревогу на каждом шаге — не через обещания доходности, а через конкретность и честность. «Можно начать с 1000 рублей» работает лучше, чем «инвестиции доступны каждому».</p>
+      <p>Менторский тон («вы должны», «важно понимать») я убрала — он создаёт дистанцию. Вместо этого — разговор на равных, как будто объясняю другу.</p>
+    </div>
+  </div>
+</div>
+
+<!-- STRUCTURE -->
+<div class="task-section" id="structure">
+  <div class="container">
+    <div class="task-eyebrow reveal">Структура</div>
+    <h2 class="reveal">Как устроена статья</h2>
+    <p class="reveal">Прежде чем писать текст, я собрала структуру — какой вопрос закрывает каждый раздел и почему именно в таком порядке.</p>
+
+    <div class="structure-items reveal">
+      <div class="structure-item">
+        <div class="structure-num">1</div>
+        <div>
+          <div class="structure-title">Лид — почему это важно именно сейчас</div>
+          <div class="structure-desc">Не «что такое инвестиции», а зачем это тебе. Начинаю с боли — деньги на вкладе проигрывают инфляции. Это конкретно и понятно без терминов.</div>
+          <div class="structure-note">Цель: зацепить и показать, что статья про тебя, а не про абстрактный рынок</div>
+        </div>
+      </div>
+      <div class="structure-item">
+        <div class="structure-num">2</div>
+        <div>
+          <div class="structure-title">Как это работает — просто</div>
+          <div class="structure-desc">Объясняю механику инвестиций через понятную аналогию. Без «волатильности» и «диверсификации» — только суть.</div>
+          <div class="structure-note">Цель: снять ощущение «это сложно и не для меня»</div>
+        </div>
+      </div>
+      <div class="structure-item">
+        <div class="structure-num">3</div>
+        <div>
+          <div class="structure-title">С чего начать — три инструмента</div>
+          <div class="structure-desc">Не все инструменты рынка, а три самых простых для новичка: фонды, облигации, акции крупных компаний. Коротко и без перегруза.</div>
+          <div class="structure-note">Цель: дать конкретный выбор, а не энциклопедию</div>
+        </div>
+      </div>
+      <div class="structure-item">
+        <div class="structure-num">4</div>
+        <div>
+          <div class="structure-title">Главное правило — не вкладывать последнее</div>
+          <div class="structure-desc">Честный блок про риски без запугивания. Короткий, конкретный, с одним правилом которое запомнится.</div>
+          <div class="structure-note">Цель: доверие через честность. Если не говорить о рисках — читатель почувствует подвох</div>
+        </div>
+      </div>
+      <div class="structure-item">
+        <div class="structure-num">5</div>
+        <div>
+          <div class="structure-title">Первый шаг — прямо сейчас</div>
+          <div class="structure-desc">CTA с конкретным действием в приложении. Не «узнать больше», а «открыть счёт за 2 минуты».</div>
+          <div class="structure-note">Цель: перевести читателя в пользователя</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ARTICLE -->
+<div class="task-section" id="article">
+  <div class="container">
+    <div class="task-eyebrow reveal">Результат</div>
+    <h2 class="reveal">Готовая статья</h2>
+    <p class="reveal">Ниже — финальный текст в том виде, в котором он появится в приложении.</p>
+  </div>
+
+  <div class="container-wide">
+    <div class="article-preview reveal">
+      <div class="article-header">
+        <div class="article-tag">Обучение · Инвестиции</div>
+        <div class="article-title">Как начать инвестировать, если вы никогда этого не делали</div>
+        <div class="article-lead">Деньги на вкладе — это надёжно. Но инфляция тихо съедает их покупательную силу каждый год. Инвестиции — способ этому противостоять. Разбираемся, как начать без страха и лишних рисков.</div>
+        <div class="article-meta">
+          <span class="article-meta-item">⏱ 5 минут</span>
+          <span class="article-meta-item">👤 Для новичков</span>
+          <span class="article-meta-item">📱 Всё можно сделать в приложении</span>
+        </div>
+      </div>
+
+      <div class="article-body">
+
+        <h3>Почему вклад — не всегда лучший вариант</h3>
+        <p>Представьте: вы положили 100 000 рублей на вклад под 8% годовых. Через год у вас 108 000 — кажется, хорошо. Но если инфляция за этот год составила 9%, ваши деньги фактически подешевели: на 108 000 вы купите меньше, чем год назад на 100 000.</p>
+        <p>Инвестиции помогают обогнать инфляцию на длинной дистанции. Не гарантированно — но исторически рынок растёт быстрее, чем дешевеют деньги.</p>
+
+        <div class="callout">
+          <div class="callout-title">Важно понимать</div>
+          <p>Инвестиции — это не способ быстро разбогатеть. Это инструмент для тех, кто готов вкладывать регулярно и смотреть на горизонт от трёх лет и дальше.</p>
+        </div>
+
+        <h3>Как это работает — без сложных слов</h3>
+        <p>Когда вы инвестируете, вы покупаете часть бизнеса или даёте в долг компании или государству. Если бизнес растёт — растёт и стоимость вашей доли. Если вы дали в долг — получаете проценты.</p>
+        <p>Всё это происходит через биржу. Банк выступает посредником: вы открываете брокерский счёт, пополняете его и покупаете нужные бумаги прямо в приложении.</p>
+
+        <h3>Три инструмента для старта</h3>
+        <p>Не нужно изучать весь рынок сразу. Для начала достаточно трёх понятных инструментов:</p>
+
+        <div class="steps-list">
+          <div class="step-item">
+            <div class="step-dot">1</div>
+            <div class="step-text"><strong>Фонды (ETF и БПИФ)</strong> — вы покупаете сразу корзину акций или облигаций. Не нужно выбирать отдельные компании — фонд делает это за вас. Хороший старт для новичка: риск распределён, порог входа низкий.</div>
+          </div>
+          <div class="step-item">
+            <div class="step-dot">2</div>
+            <div class="step-text"><strong>Облигации</strong> — вы даёте в долг компании или государству на определённый срок. Доходность известна заранее, риск ниже, чем у акций. Подходит, если хочется предсказуемости.</div>
+          </div>
+          <div class="step-item">
+            <div class="step-dot">3</div>
+            <div class="step-text"><strong>Акции крупных компаний</strong> — доля в бизнесе известных корпораций. Потенциальная доходность выше, но и колебания сильнее. Для тех, кто готов к небольшому риску и смотрит на 3–5 лет.</div>
+          </div>
+        </div>
+
+        <div class="callout green">
+          <div class="callout-title">Сколько нужно для старта</div>
+          <p>Начать можно с любой суммы — даже с 1000 рублей. Главное не размер, а регулярность: небольшие вложения каждый месяц работают лучше, чем разовая крупная сумма раз в год.</p>
+        </div>
+
+        <h3>Одно правило, которое защитит от ошибок</h3>
+        <p>Инвестируйте только те деньги, которые вам не понадобятся в ближайший год-два. Рынок бывает нестабильным, и если придётся срочно продавать в «минус» — это неприятно.</p>
+        <p>Сначала создайте финансовую подушку на 3–6 месяцев расходов. Вот эти деньги лучше держать на вкладе. Остальное — можно инвестировать.</p>
+
+        <div class="callout yellow">
+          <div class="callout-title">Честно о рисках</div>
+          <p>Инвестиции не застрахованы государством, в отличие от вкладов. Стоимость активов может падать. Прошлая доходность не гарантирует будущую. Это нормальная часть инвестирования — важно это принять до того, как начать.</p>
+        </div>
+
+        <h3>Первый шаг — прямо сейчас</h3>
+        <p>Чтобы начать, нужно открыть брокерский счёт — это занимает около двух минут в приложении. Никаких документов, офисов и сложных форм.</p>
+
+        <div class="steps-list">
+          <div class="step-item">
+            <div class="step-dot">1</div>
+            <div class="step-text">Откройте раздел «Инвестиции» в приложении</div>
+          </div>
+          <div class="step-item">
+            <div class="step-dot">2</div>
+            <div class="step-text">Нажмите «Открыть брокерский счёт» — данные подтянутся автоматически</div>
+          </div>
+          <div class="step-item">
+            <div class="step-dot">3</div>
+            <div class="step-text">Пополните счёт на любую сумму и выберите первый инструмент</div>
+          </div>
+        </div>
+
+        <div style="background: var(--ink); border-radius: 12px; padding: 24px; margin-top: 28px; text-align: center;">
+          <div style="font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 6px;">Открыть брокерский счёт</div>
+          <div style="font-size: 13px; color: rgba(255,255,255,.6);">Займёт 2 минуты · Без документов</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EDITORIAL CHOICES -->
+<div class="task-section" id="choices">
+  <div class="container">
+    <div class="task-eyebrow reveal">Редакторские решения</div>
+    <h2 class="reveal">Что и почему я выбрала</h2>
+    <p class="reveal">Несколько конкретных решений, которые объясняют, почему текст написан именно так.</p>
+
+    <div class="ba-grid reveal">
+      <div class="ba-card before">
+        <div class="ba-label">Было бы</div>
+        <div class="ba-body">«Инвестиции — это вложение денег с целью получения прибыли в будущем. Существуют различные инструменты: акции, облигации, ETF, ПИФы...»</div>
+        <div class="ba-note">Энциклопедия, а не помощь</div>
+      </div>
+      <div class="ba-card after">
+        <div class="ba-label">Стало</div>
+        <div class="ba-body">«Когда вы инвестируете, вы покупаете часть бизнеса или даёте в долг компании. Если бизнес растёт — растёт и ваша доля.»</div>
+        <div class="ba-note">Механика через образ — понятно сразу</div>
+      </div>
+
+      <div class="ba-card before">
+        <div class="ba-label">Было бы</div>
+        <div class="ba-body">«Диверсификация портфеля снижает несистематические риски и позволяет сгладить волатильность активов.»</div>
+        <div class="ba-note">Термины без объяснения = барьер</div>
+      </div>
+      <div class="ba-card after">
+        <div class="ba-label">Стало</div>
+        <div class="ba-body">«Фонд — это корзина акций сразу нескольких компаний. Если одна упадёт, остальные могут компенсировать потери.»</div>
+        <div class="ba-note">То же самое — через конкретный образ</div>
+      </div>
+
+      <div class="ba-card before">
+        <div class="ba-label">Было бы</div>
+        <div class="ba-body">«Инвестируйте только свободные средства и не забывайте о формировании финансовой подушки безопасности.»</div>
+        <div class="ba-note">Правильно, но скучно и безлично</div>
+      </div>
+      <div class="ba-card after">
+        <div class="ba-label">Стало</div>
+        <div class="ba-body">«Сначала создайте подушку на 3–6 месяцев расходов и держите её на вкладе. Остальное — можно инвестировать.»</div>
+        <div class="ba-note">Конкретный порядок действий вместо совета</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROCESS -->
+<div class="process-section" id="process">
+  <div class="container">
+    <div class="task-eyebrow reveal">Разбор</div>
+    <h2 class="reveal">Как я думала над статьёй</h2>
+    <div class="process-items reveal">
+      <div class="process-item">
+        <div class="process-item-label">Начала с эмоции, не с определения</div>
+        <div class="process-item-body">
+          Большинство статей про инвестиции начинаются с «инвестиции — это...». Я начала с боли: деньги на вкладе теряют покупательную силу. <strong>Читатель сразу понимает, зачем ему это читать</strong> — не потому что инвестиции «важны», а потому что это касается его денег прямо сейчас.
+        </div>
+      </div>
+      <div class="process-item">
+        <div class="process-item-label">Три инструмента вместо рынка целиком</div>
+        <div class="process-item-body">
+          Новичок, который видит список из 15 инструментов, закрывает статью. Я выбрала три — фонды, облигации, акции — и объяснила каждый одним абзацем. <strong>Цель не образование, а первый шаг.</strong> Углубиться можно потом.
+        </div>
+      </div>
+      <div class="process-item">
+        <div class="process-item-label">Риски — честно, не пугая</div>
+        <div class="process-item-body">
+          Если не написать про риски — читатель почувствует, что его продают. Если написать страшно — закроет и уйдёт. Я написала коротко и фактически: <strong>что именно не гарантировано и почему это нормально.</strong> Доверие строится через честность, а не через умолчание.
+        </div>
+      </div>
+      <div class="process-item">
+        <div class="process-item-label">CTA — действие, а не «узнать больше»</div>
+        <div class="process-item-body">
+          Финальный призыв — конкретный: открыть счёт за 2 минуты в приложении. Не «изучите наши продукты» и не «свяжитесь с нами». <strong>Пользователь должен знать ровно один следующий шаг</strong> — и этот шаг должен быть маленьким и нестрашным.
+        </div>
+      </div>
+      <div class="process-item">
+        <div class="process-item-label">Тон — друг, а не эксперт</div>
+        <div class="process-item-body">
+          Я убрала все конструкции вида «важно понимать», «следует отметить», «необходимо учитывать». Статья написана от второго лица — «вы», «ваши деньги», «вам». <strong>Читатель чувствует, что текст написан для него, а не для всех сразу.</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="case-cta">
+  <div class="container">
+    <p>Понравился кейс? Посмотрите другие работы или напишите мне</p>
+    <div class="cta-btns">
+      <a href="index.html#cases" class="cta-btn-secondary">Все кейсы</a>
+      <a href="https://t.me/mashakazak" class="cta-btn-primary">Написать в Telegram</a>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-name">Маша Казак</div>
+      <div class="footer-sub">UX-редактор · Москва</div>
+    </div>
+    <div class="footer-contacts">
+      <a href="mailto:Cassaque@gmail.com" class="footer-contact">Cassaque@gmail.com</a>
+      <a href="https://t.me/mashakazak" class="footer-contact">@mashakazak</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 10));
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+  }, { threshold: 0.07 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
