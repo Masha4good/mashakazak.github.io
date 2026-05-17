@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UX-редактура для банка | Маша Казак</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-secondary: #f7f7f5;
+    --ink: #1a1a1a;
+    --ink-soft: #555;
+    --ink-muted: #999;
+    --accent: #2563eb;
+    --accent-bg: #eff6ff;
+    --line: #e8e8e4;
+    --radius: 12px;
+    --sans: 'Inter', -apple-system, sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 48px; height: 60px;
+    background: rgba(255,255,255,0.92); backdrop-filter: blur(16px);
+    border-bottom: 1px solid transparent; transition: border-color .2s;
+  }
+  nav.scrolled { border-bottom-color: var(--line); }
+  .nav-logo { font-size: 15px; font-weight: 600; color: var(--ink); text-decoration: none; }
+  .nav-back { font-size: 13px; font-weight: 500; color: var(--ink-soft); text-decoration: none; display: flex; align-items: center; gap: 6px; transition: color .15s; }
+  .nav-back:hover { color: var(--ink); }
+  .nav-cta { display: flex; gap: 16px; align-items: center; }
+  .nav-cta a { font-size: 13px; font-weight: 500; color: var(--ink-soft); text-decoration: none; transition: color .15s; }
+  .nav-cta a:hover { color: var(--ink); }
+  .btn { background: var(--ink); color: #fff !important; padding: 7px 16px; border-radius: 6px; font-size: 13px; font-weight: 500; text-decoration: none; transition: opacity .15s; }
+  .btn:hover { opacity: .8; }
+
+  /* LAYOUT */
+  .container { max-width: 780px; margin: 0 auto; padding: 0 48px; }
+  .container-wide { max-width: 1080px; margin: 0 auto; padding: 0 48px; }
+
+  /* HERO */
+  .case-hero {
+    padding: 120px 0 64px;
+    border-bottom: 1px solid var(--line);
+  }
+  .case-eyebrow {
+    display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 20px;
+    opacity: 0; animation: fadeUp .5s ease forwards .1s;
+  }
+  .case-hero h1 {
+    font-size: clamp(32px, 4.5vw, 52px); font-weight: 700; letter-spacing: -0.03em;
+    line-height: 1.1; margin-bottom: 20px;
+    opacity: 0; animation: fadeUp .5s ease forwards .2s;
+  }
+  .case-hero-desc {
+    font-size: 17px; line-height: 1.75; color: var(--ink-soft);
+    margin-bottom: 40px; max-width: 600px;
+    opacity: 0; animation: fadeUp .5s ease forwards .3s;
+  }
+  .case-meta {
+    display: flex; gap: 32px; flex-wrap: wrap;
+    opacity: 0; animation: fadeUp .5s ease forwards .4s;
+  }
+  .meta-item { display: flex; flex-direction: column; gap: 4px; }
+  .meta-label { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-muted); }
+  .meta-val { font-size: 14px; font-weight: 600; }
+
+  /* FIGMA BLOCK */
+  .figma-block {
+    background: var(--bg-secondary); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 24px 28px; display: flex; align-items: center; justify-content: space-between;
+    gap: 20px; margin: 40px 0; flex-wrap: wrap;
+  }
+  .figma-block-text { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .figma-block-sub { font-size: 13px; color: var(--ink-soft); }
+  .figma-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #1e1e1e; color: #fff; padding: 10px 20px; border-radius: 8px;
+    font-size: 13px; font-weight: 500; text-decoration: none; white-space: nowrap;
+    transition: opacity .15s; flex-shrink: 0;
+  }
+  .figma-btn:hover { opacity: .85; }
+
+  /* TASK NAV */
+  .task-nav {
+    display: flex; gap: 8px; padding: 32px 0; border-bottom: 1px solid var(--line);
+    flex-wrap: wrap;
+  }
+  .task-nav a {
+    font-size: 13px; font-weight: 500; color: var(--ink-soft);
+    text-decoration: none; padding: 6px 14px; border-radius: 6px;
+    background: var(--bg-secondary); border: 1px solid var(--line);
+    transition: all .15s;
+  }
+  .task-nav a:hover { border-color: #ccc; color: var(--ink); }
+
+  /* TASK SECTIONS */
+  .task-section { padding: 72px 0; border-bottom: 1px solid var(--line); }
+  .task-eyebrow {
+    font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--ink-muted); margin-bottom: 16px;
+  }
+  .task-section h2 {
+    font-size: clamp(24px, 3vw, 34px); font-weight: 700; letter-spacing: -0.025em;
+    line-height: 1.2; margin-bottom: 20px;
+  }
+  .task-section p {
+    font-size: 15px; line-height: 1.75; color: var(--ink-soft); margin-bottom: 16px;
+  }
+  .task-section p:last-child { margin-bottom: 0; }
+
+  /* THINKING BLOCK */
+  .thinking {
+    background: var(--bg-secondary); border-left: 3px solid var(--accent);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 24px 28px; margin: 32px 0;
+  }
+  .thinking-title {
+    font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 14px;
+  }
+  .thinking p { font-size: 14px; line-height: 1.75; color: var(--ink-soft); margin-bottom: 10px; }
+  .thinking p:last-child { margin-bottom: 0; }
+
+  /* SCREEN MOCKUPS */
+  .screens { margin: 40px 0; display: flex; flex-direction: column; gap: 16px; }
+  .screen {
+    background: var(--bg-secondary); border: 1px solid var(--line); border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .screen-label {
+    padding: 12px 20px; border-bottom: 1px solid var(--line);
+    font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--ink-muted); display: flex; align-items: center; gap: 8px;
+  }
+  .screen-label::before {
+    content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--line);
+  }
+  .screen-body { padding: 32px; }
+
+  /* PHONE MOCKUP */
+  .phone-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 40px 0; }
+  .phone {
+    background: #1a1a1a; border-radius: 24px; padding: 20px 16px;
+    display: flex; flex-direction: column; gap: 0; min-height: 360px;
+  }
+  .phone-status { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .phone-time { font-size: 12px; font-weight: 600; color: rgba(255,255,255,.9); }
+  .phone-icons { display: flex; gap: 4px; align-items: center; }
+  .phone-icons span { width: 14px; height: 8px; background: rgba(255,255,255,.7); border-radius: 2px; display: block; }
+
+  .phone-screen { background: #fff; border-radius: 16px; flex: 1; padding: 20px 16px; display: flex; flex-direction: column; gap: 12px; overflow: hidden; }
+
+  /* notification card */
+  .notif-card { background: #f7f7f5; border-radius: 12px; padding: 14px; }
+  .notif-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .notif-icon { width: 28px; height: 28px; border-radius: 8px; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .notif-app { font-size: 11px; font-weight: 600; color: var(--ink-muted); }
+  .notif-time { font-size: 11px; color: var(--ink-muted); margin-left: auto; }
+  .notif-title { font-size: 13px; font-weight: 600; line-height: 1.3; margin-bottom: 4px; color: var(--ink); }
+  .notif-text { font-size: 12px; line-height: 1.5; color: var(--ink-soft); }
+
+  /* push variants */
+  .push-variant { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12); border-radius: 16px; padding: 14px; margin-bottom: 8px; }
+  .push-variant:last-child { margin-bottom: 0; }
+  .push-header { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+  .push-app-icon { width: 20px; height: 20px; border-radius: 5px; background: var(--accent); flex-shrink: 0; }
+  .push-app-name { font-size: 11px; font-weight: 600; color: rgba(255,255,255,.5); }
+  .push-num { font-size: 10px; color: rgba(255,255,255,.3); margin-left: auto; }
+  .push-title { font-size: 12px; font-weight: 600; color: #fff; line-height: 1.3; margin-bottom: 3px; }
+  .push-body { font-size: 11px; color: rgba(255,255,255,.6); line-height: 1.4; }
+
+  /* form screen */
+  .form-screen { display: flex; flex-direction: column; gap: 0; }
+  .form-back { font-size: 11px; color: var(--accent); font-weight: 500; margin-bottom: 12px; }
+  .form-progress { height: 3px; background: #eee; border-radius: 2px; margin-bottom: 16px; position: relative; overflow: hidden; }
+  .form-progress-fill { height: 100%; background: var(--accent); border-radius: 2px; }
+  .form-step { font-size: 10px; color: var(--ink-muted); margin-bottom: 6px; font-weight: 500; }
+  .form-title { font-size: 15px; font-weight: 700; line-height: 1.3; margin-bottom: 6px; color: var(--ink); }
+  .form-subtitle { font-size: 11px; color: var(--ink-soft); line-height: 1.4; margin-bottom: 14px; }
+  .form-field { background: #f7f7f5; border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; }
+  .form-field-label { font-size: 10px; font-weight: 600; color: var(--ink-muted); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 2px; }
+  .form-field-val { font-size: 13px; font-weight: 500; color: var(--ink); }
+  .form-hint { font-size: 10px; color: var(--ink-muted); margin-bottom: 12px; line-height: 1.4; }
+  .form-btn { background: var(--accent); color: #fff; border-radius: 10px; padding: 11px; text-align: center; font-size: 13px; font-weight: 600; margin-top: auto; }
+
+  /* variants table */
+  .variants { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; margin: 32px 0; }
+  .variant-row { display: grid; grid-template-columns: 80px 1fr; border-bottom: 1px solid var(--line); }
+  .variant-row:last-child { border-bottom: none; }
+  .variant-num {
+    padding: 20px; background: var(--bg-secondary); border-right: 1px solid var(--line);
+    font-size: 12px; font-weight: 700; color: var(--ink-muted); display: flex; align-items: flex-start;
+  }
+  .variant-content { padding: 20px 24px; }
+  .variant-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .variant-text { font-size: 13px; color: var(--ink-soft); line-height: 1.6; }
+  .variant-note { font-size: 12px; color: var(--accent); margin-top: 8px; font-weight: 500; }
+
+  /* process section */
+  .process-section { padding: 72px 0; }
+  .process-section h2 { font-size: clamp(24px, 3vw, 34px); font-weight: 700; letter-spacing: -0.025em; line-height: 1.2; margin-bottom: 40px; }
+
+  .process-items { display: flex; flex-direction: column; gap: 0; }
+  .process-item { display: grid; grid-template-columns: 200px 1fr; gap: 32px; padding: 32px 0; border-bottom: 1px solid var(--line); }
+  .process-item:last-child { border-bottom: none; }
+  .process-item-label { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; padding-top: 2px; }
+  .process-item-body { font-size: 14px; line-height: 1.75; color: var(--ink-soft); }
+  .process-item-body strong { color: var(--ink); font-weight: 600; }
+
+  /* CTA */
+  .case-cta { padding: 64px 0; text-align: center; }
+  .case-cta p { font-size: 16px; color: var(--ink-soft); margin-bottom: 24px; }
+  .cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .cta-btn-primary { background: var(--ink); color: #fff; padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none; transition: opacity .15s; }
+  .cta-btn-primary:hover { opacity: .85; }
+  .cta-btn-secondary { background: var(--bg-secondary); border: 1px solid var(--line); color: var(--ink); padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none; transition: border-color .15s; }
+  .cta-btn-secondary:hover { border-color: #ccc; }
+
+  /* FOOTER */
+  footer { padding: 48px 0; border-top: 1px solid var(--line); }
+  .footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; max-width: 1080px; margin: 0 auto; padding: 0 48px; }
+  .footer-name { font-size: 16px; font-weight: 700; letter-spacing: -0.02em; }
+  .footer-sub { font-size: 13px; color: var(--ink-muted); }
+  .footer-contacts { display: flex; gap: 20px; flex-wrap: wrap; }
+  .footer-contact { font-size: 13px; font-weight: 500; color: var(--ink-soft); text-decoration: none; transition: color .15s; }
+  .footer-contact:hover { color: var(--ink); }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+  .reveal { opacity:0; transform:translateY(14px); transition: opacity .5s ease, transform .5s ease; }
+  .reveal.visible { opacity:1; transform:translateY(0); }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    nav { padding: 0 24px; }
+    .container, .container-wide { padding: 0 24px; }
+    .phone-row { grid-template-columns: 1fr; max-width: 320px; }
+    .process-item { grid-template-columns: 1fr; gap: 12px; }
+    .process-item-label { padding-top: 0; }
+    footer .footer-inner { padding: 0 24px; }
+    .case-hero { padding: 100px 0 48px; }
+  }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <a href="index.html" class="nav-logo">Маша Казак</a>
+  <a href="index.html#cases" class="nav-back">← Все кейсы</a>
+  <div class="nav-cta">
+    <a href="https://t.me/mashakazak" class="btn">Написать</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="case-hero">
+  <div class="container">
+    <div class="case-eyebrow">UX-редактура</div>
+    <h1>UX-тексты для банка:<br>пуши, онбординг и ошибки</h1>
+    <p class="case-hero-desc">Тестовое задание из трёх частей: три варианта пуша для реактивации, онбординг нового продукта и сообщения об ошибках в переводах.</p>
+    <div class="case-meta">
+      <div class="meta-item">
+        <span class="meta-label">Формат</span>
+        <span class="meta-val">Тестовое задание</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Задачи</span>
+        <span class="meta-val">3 задания</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Продукт</span>
+        <span class="meta-val">Мобильный банк</span>
+      </div>
+    </div>
+
+    <div class="figma-block">
+      <div>
+        <div class="figma-block-text">Посмотреть кейс в Figma</div>
+        <div class="figma-block-sub">Полные экраны, состояния и тексты интерфейса</div>
+      </div>
+      <a href="#" class="figma-btn">
+        <svg width="16" height="16" viewBox="0 0 38 38" fill="none"><rect x="1" y="1" width="16" height="16" rx="4" fill="#F24E1E"/><rect x="21" y="1" width="16" height="16" rx="4" fill="#FF7262"/><rect x="1" y="21" width="16" height="16" rx="4" fill="#A259FF"/><circle cx="29" cy="29" r="8" fill="#1ABCFE"/></svg>
+        Открыть в Figma
+      </a>
+    </div>
+
+    <div class="task-nav">
+      <a href="#task1">Пуши</a>
+      <a href="#task2">Онбординг</a>
+      <a href="#task3">Ошибки</a>
+      <a href="#process">Разбор</a>
+    </div>
+  </div>
+</div>
+
+<!-- TASK 1: ПУШИ -->
+<div class="task-section" id="task1">
+  <div class="container">
+    <div class="task-eyebrow reveal">Задание 1</div>
+    <h2 class="reveal">Три варианта пуша для реактивации</h2>
+    <p class="reveal">Пользователь не заходил в приложение больше 30 дней. Нужно вернуть его в продукт — написать три варианта пуша, которые отличаются по подходу и тону. Ограничений по длине нет, но хочется уложиться в стандарт мобильного уведомления.</p>
+
+    <div class="thinking reveal">
+      <div class="thinking-title">Как я рассуждала</div>
+      <p>Сначала поняла, кто этот пользователь. Он знает продукт — иначе не устанавливал бы приложение. Значит, объяснять что такое банк не нужно. Скорее всего, ушёл по одной из трёх причин: нашёл альтернативу, просто забыл, или что-то пошло не так при использовании.</p>
+      <p>Сделала три пуша с разными крючками: первый — через выгоду (что он пропускает), второй — через любопытство (что изменилось), третий — лёгкий и без давления (мы не обижаемся). Важно не обвинять и не давить — пользователь сам решает, возвращаться ли.</p>
+      <p>Проверила длину: заголовок — до 50 символов, тело — до 100. iOS и Android обрезают длиннее.</p>
+    </div>
+
+    <div class="variants reveal">
+      <div class="variant-row">
+        <div class="variant-num">А</div>
+        <div class="variant-content">
+          <div class="variant-title">Ваш кэшбэк ждёт — уже ₽340</div>
+          <div class="variant-text">За покупки прошлого месяца начислен кэшбэк. Зайдите, чтобы потратить его на что угодно.</div>
+          <div class="variant-note">Крючок: конкретная выгода. Работает, если у пользователя есть незабранный кэшбэк или бонусы.</div>
+        </div>
+      </div>
+      <div class="variant-row">
+        <div class="variant-num">Б</div>
+        <div class="variant-content">
+          <div class="variant-title">Кое-что изменилось, пока вас не было</div>
+          <div class="variant-text">Новые функции, улучшенный переводы и ещё пара сюрпризов. Загляните — интересно.</div>
+          <div class="variant-note">Крючок: любопытство. Подходит после обновлений или редизайна. Не раскрывает всё сразу.</div>
+        </div>
+      </div>
+      <div class="variant-row">
+        <div class="variant-num">В</div>
+        <div class="variant-content">
+          <div class="variant-title">Давно не виделись 👋</div>
+          <div class="variant-text">Мы вас не торопим. Просто напомнили — всё на месте, когда будете готовы.</div>
+          <div class="variant-note">Крючок: снятие давления. Парадоксально, но отсутствие агрессии возвращает лучше, чем срочность.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phone mockups -->
+    <div class="phone-row reveal">
+      <div class="phone">
+        <div class="phone-status">
+          <span class="phone-time">9:41</span>
+          <div class="phone-icons"><span></span></div>
+        </div>
+        <div style="flex:1; display:flex; flex-direction:column; gap:8px;">
+          <div class="push-variant">
+            <div class="push-header">
+              <div class="push-app-icon"></div>
+              <span class="push-app-name">Банк</span>
+              <span class="push-num">сейчас</span>
+            </div>
+            <div class="push-title">Ваш кэшбэк ждёт — уже ₽340</div>
+            <div class="push-body">За покупки прошлого месяца начислен кэшбэк. Зайдите, чтобы потратить его на что угодно.</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone">
+        <div class="phone-status">
+          <span class="phone-time">9:41</span>
+          <div class="phone-icons"><span></span></div>
+        </div>
+        <div style="flex:1; display:flex; flex-direction:column; gap:8px;">
+          <div class="push-variant">
+            <div class="push-header">
+              <div class="push-app-icon"></div>
+              <span class="push-app-name">Банк</span>
+              <span class="push-num">сейчас</span>
+            </div>
+            <div class="push-title">Кое-что изменилось, пока вас не было</div>
+            <div class="push-body">Новые функции, улучшенные переводы и ещё пара сюрпризов. Загляните — интересно.</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone">
+        <div class="phone-status">
+          <span class="phone-time">9:41</span>
+          <div class="phone-icons"><span></span></div>
+        </div>
+        <div style="flex:1; display:flex; flex-direction:column; gap:8px;">
+          <div class="push-variant">
+            <div class="push-header">
+              <div class="push-app-icon"></div>
+              <span class="push-app-name">Банк</span>
+              <span class="push-num">сейчас</span>
+            </div>
+            <div class="push-title">Давно не виделись 👋</div>
+            <div class="push-body">Мы вас не торопим. Просто напомнили — всё на месте, когда будете готовы.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TASK 2: ОНБОРДИНГ -->
+<div class="task-section" id="task2">
+  <div class="container">
+    <div class="task-eyebrow reveal">Задание 2</div>
+    <h2 class="reveal">Онбординг нового продукта — накопительный счёт</h2>
+    <p class="reveal">Банк запускает накопительный счёт с процентом на остаток. Нужно написать тексты для четырёх онбординг-экранов: от первого знакомства с продуктом до его активации.</p>
+
+    <div class="thinking reveal">
+      <div class="thinking-title">Как я рассуждала</div>
+      <p>Накопительный счёт — продукт с низким барьером, но высокой тревогой: люди боятся «заморозить» деньги или потерять доступ. Главная задача онбординга — снять этот страх до того, как пользователь успеет его сформулировать.</p>
+      <p>Структура: 1) что это и зачем, 2) как работает (просто), 3) условия без бюрократии, 4) активация. Каждый экран — один тезис. Не пытаться объяснить всё сразу.</p>
+      <p>Тон — спокойный, без восклицательных знаков и «уже сегодня». Финансы требуют доверия, а не ажиотажа.</p>
+    </div>
+
+    <!-- Onboarding phones -->
+    <div class="phone-row reveal" style="grid-template-columns: repeat(4, 1fr);">
+
+      <div class="phone" style="min-height:420px;">
+        <div class="phone-status"><span class="phone-time">9:41</span></div>
+        <div class="phone-screen form-screen">
+          <div class="form-progress"><div class="form-progress-fill" style="width:25%"></div></div>
+          <div style="font-size:32px; margin-bottom:12px;">💰</div>
+          <div class="form-title">Деньги работают, пока вы занимаетесь своим</div>
+          <div class="form-subtitle">Накопительный счёт начисляет процент каждый день — просто за то, что деньги лежат.</div>
+          <div style="margin-top:auto;">
+            <div class="form-btn">Узнать подробнее</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="phone" style="min-height:420px;">
+        <div class="phone-status"><span class="phone-time">9:41</span></div>
+        <div class="phone-screen form-screen">
+          <div class="form-progress"><div class="form-progress-fill" style="width:50%"></div></div>
+          <div class="form-step">Как это работает</div>
+          <div class="form-title">Пополняйте и снимайте когда угодно</div>
+          <div class="form-subtitle">Без минимального срока и штрафов. Процент начисляется на любую сумму — хоть на тысячу рублей.</div>
+          <div style="background:#eff6ff; border-radius:8px; padding:12px; margin-top:8px;">
+            <div style="font-size:11px; font-weight:600; color:#1d4ed8; margin-bottom:4px;">Например</div>
+            <div style="font-size:12px; color:#1e40af; line-height:1.4;">₽50 000 под 8% годовых — это ₽11 в день без ничего лишнего</div>
+          </div>
+          <div style="margin-top:auto;"><div class="form-btn">Дальше</div></div>
+        </div>
+      </div>
+
+      <div class="phone" style="min-height:420px;">
+        <div class="phone-status"><span class="phone-time">9:41</span></div>
+        <div class="phone-screen form-screen">
+          <div class="form-progress"><div class="form-progress-fill" style="width:75%"></div></div>
+          <div class="form-step">Условия</div>
+          <div class="form-title">Без скрытых условий</div>
+          <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px;">
+            <div style="display:flex; gap:8px; font-size:12px; color:#1a1a1a; align-items:flex-start;">
+              <span style="color:#22c55e; font-weight:700; flex-shrink:0;">✓</span>
+              <span>8% годовых на остаток</span>
+            </div>
+            <div style="display:flex; gap:8px; font-size:12px; color:#1a1a1a; align-items:flex-start;">
+              <span style="color:#22c55e; font-weight:700; flex-shrink:0;">✓</span>
+              <span>Снятие без потери процентов</span>
+            </div>
+            <div style="display:flex; gap:8px; font-size:12px; color:#1a1a1a; align-items:flex-start;">
+              <span style="color:#22c55e; font-weight:700; flex-shrink:0;">✓</span>
+              <span>Деньги застрахованы до ₽1,4 млн</span>
+            </div>
+            <div style="display:flex; gap:8px; font-size:12px; color:#1a1a1a; align-items:flex-start;">
+              <span style="color:#22c55e; font-weight:700; flex-shrink:0;">✓</span>
+              <span>Открытие за 10 секунд</span>
+            </div>
+          </div>
+          <div style="margin-top:auto;"><div class="form-btn">Понятно</div></div>
+        </div>
+      </div>
+
+      <div class="phone" style="min-height:420px;">
+        <div class="phone-status"><span class="phone-time">9:41</span></div>
+        <div class="phone-screen form-screen">
+          <div class="form-progress"><div class="form-progress-fill" style="width:100%"></div></div>
+          <div class="form-step">Готово к открытию</div>
+          <div class="form-title">Накопительный счёт</div>
+          <div class="form-field">
+            <div class="form-field-label">Ставка</div>
+            <div class="form-field-val">8% годовых</div>
+          </div>
+          <div class="form-field">
+            <div class="form-field-label">Минимальная сумма</div>
+            <div class="form-field-val">Любая</div>
+          </div>
+          <div class="form-field">
+            <div class="form-field-label">Пополнение и снятие</div>
+            <div class="form-field-val">В любое время</div>
+          </div>
+          <div class="form-hint">Открывая счёт, вы соглашаетесь с условиями обслуживания</div>
+          <div style="margin-top:auto;"><div class="form-btn">Открыть счёт</div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- TASK 3: ОШИБКИ -->
+<div class="task-section" id="task3">
+  <div class="container">
+    <div class="task-eyebrow reveal">Задание 3</div>
+    <h2 class="reveal">Сообщения об ошибках в переводах</h2>
+    <p class="reveal">Исходные тексты ошибок написаны техническим языком — нужно переписать пять сценариев так, чтобы пользователь понял что произошло и знал что делать дальше.</p>
+
+    <div class="thinking reveal">
+      <div class="thinking-title">Как я рассуждала</div>
+      <p>Ошибка — самый стрессовый момент в финансовом интерфейсе. Человек отправлял деньги и что-то пошло не так. В этот момент важны три вещи: что случилось, деньги в безопасности или нет, и что делать.</p>
+      <p>Хорошая ошибка отвечает на все три вопроса. Плохая — говорит «Ошибка 403» или «Что-то пошло не так» и оставляет человека один на один с тревогой.</p>
+      <p>Убрала коды ошибок из видимого текста, убрала пассивный залог, добавила конкретное действие в каждый экран. Сохранила технические детали для поддержки — они не нужны пользователю, но нужны специалисту.</p>
+    </div>
+
+    <div class="screens reveal">
+
+      <div class="screen">
+        <div class="screen-label">Недостаточно средств</div>
+        <div class="screen-body" style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+          <div>
+            <div style="font-size:11px; font-weight:600; color:var(--ink-muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:10px;">Было</div>
+            <div style="background:#fff5f5; border:1px solid #fecaca; border-radius:8px; padding:14px;">
+              <div style="font-size:13px; font-weight:600; color:#991b1b; margin-bottom:4px;">Операция отклонена</div>
+              <div style="font-size:12px; color:#7f1d1d; line-height:1.5;">Недостаточно средств для выполнения операции. Код ошибки: INSUFFICIENT_FUNDS_4021</div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:11px; font-weight:600; color:var(--ink-muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:10px;">Стало</div>
+            <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:14px;">
+              <div style="font-size:13px; font-weight:600; color:#166534; margin-bottom:4px;">Не хватает ₽320</div>
+              <div style="font-size:12px; color:#166534; line-height:1.5;">На карте ₽4 680, для перевода нужно ₽5 000. Пополните карту или уменьшите сумму.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="screen-label">Лимит переводов</div>
+        <div class="screen-body" style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+          <div>
+            <div style="font-size:11px; font-weight:600; color:var(--ink-muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:10px;">Было</div>
+            <div style="background:#fff5f5; border:1px solid #fecaca; border-radius:8px; padding:14px;">
+              <div style="font-size:13px; font-weight:600; color:#991b1b; margin-bottom:4px;">Превышен лимит</div>
+              <div style="font-size:12px; color:#7f1d1d; line-height:1.5;">Суточный лимит переводов исчерпан. Попробуйте позже или обратитесь в поддержку.</div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:11px; font-weight:600; color:var(--ink-muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:10px;">Стало</div>
+            <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:14px;">
+              <div style="font-size:13px; font-weight:600; color:#166534; margin-bottom:4px;">Суточный лимит исчерпан</div>
+              <div style="font-size:12px; color:#166534; line-height:1.5;">Вы уже перевели ₽100 000 сегодня — это максимум. Лимит обновится завтра в 00:00.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="screen-label">Неверные реквизиты получателя</div>
+        <div class="screen-body" style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+          <div>
+            <div style="font-size:11px; font-weight:600; color:var(--ink-muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:10px;">Было</div>
+            <div style="background:#fff5f5; border:1px solid #fecaca; border-radius:8px; padding:14px;">
+              <div style="font-size:13px; font-weight:600; color:#991b1b; margin-bottom:4px;">Ошибка валидации</div>
+              <div style="font-size:12px; color:#7f1d1d; line-height:1.5;">Введённые реквизиты не прошли валидацию. Проверьте корректность данных получателя.</div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:11px; font-weight:600; color:var(--ink-muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:10px;">Стало</div>
+            <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:14px;">
+              <div style="font-size:13px; font-weight:600; color:#166534; margin-bottom:4px;">Проверьте номер карты</div>
+              <div style="font-size:12px; color:#166534; line-height:1.5;">Такой карты не существует или она заблокирована. Уточните реквизиты у получателя.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="screen-label">Технический сбой на стороне банка</div>
+        <div class="screen-body" style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+          <div>
+            <div style="font-size:11px; font-weight:600; color:var(--ink-muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:10px;">Было</div>
+            <div style="background:#fff5f5; border:1px solid #fecaca; border-radius:8px; padding:14px;">
+              <div style="font-size:13px; font-weight:600; color:#991b1b; margin-bottom:4px;">Ошибка 500</div>
+              <div style="font-size:12px; color:#7f1d1d; line-height:1.5;">Internal server error. Попробуйте позже.</div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:11px; font-weight:600; color:var(--ink-muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:10px;">Стало</div>
+            <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:14px;">
+              <div style="font-size:13px; font-weight:600; color:#166534; margin-bottom:4px;">Перевод не ушёл — деньги в безопасности</div>
+              <div style="font-size:12px; color:#166534; line-height:1.5;">Что-то пошло не так на нашей стороне. Средства остались на вашей карте. Попробуйте через несколько минут.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="screen-label">Подозрительная операция</div>
+        <div class="screen-body" style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+          <div>
+            <div style="font-size:11px; font-weight:600; color:var(--ink-muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:10px;">Было</div>
+            <div style="background:#fff5f5; border:1px solid #fecaca; border-radius:8px; padding:14px;">
+              <div style="font-size:13px; font-weight:600; color:#991b1b; margin-bottom:4px;">Операция заблокирована</div>
+              <div style="font-size:12px; color:#7f1d1d; line-height:1.5;">Операция заблокирована системой безопасности. Обратитесь в службу поддержки.</div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:11px; font-weight:600; color:var(--ink-muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:10px;">Стало</div>
+            <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:14px;">
+              <div style="font-size:13px; font-weight:600; color:#166534; margin-bottom:4px;">Мы остановили этот перевод</div>
+              <div style="font-size:12px; color:#166534; line-height:1.5;">Он показался нам необычным. Если вы его инициировали — позвоните нам, разберёмся за минуту.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- PROCESS -->
+<div class="process-section" id="process">
+  <div class="container">
+    <div class="task-eyebrow reveal">Процесс</div>
+    <h2 class="reveal">Разбор решений</h2>
+    <div class="process-items reveal">
+      <div class="process-item">
+        <div class="process-item-label">Пуши: три разных крючка</div>
+        <div class="process-item-body">
+          Сделала три принципиально разных подхода, а не три вариации одного. <strong>Выгода</strong> работает, когда есть конкретный повод зайти. <strong>Любопытство</strong> — когда продукт обновился. <strong>Снятие давления</strong> — парадоксально, но работает лучше агрессивных «Вы пропускаете!»: пользователь не чувствует себя виноватым и охотнее возвращается.
+        </div>
+      </div>
+      <div class="process-item">
+        <div class="process-item-label">Онбординг: один экран — один тезис</div>
+        <div class="process-item-body">
+          Главный принцип — не пытаться объяснить всё сразу. Первый экран снимает основной страх («деньги нельзя снять»). Второй даёт конкретный пример с цифрами — абстрактные «%» не работают. Третий отвечает на возражения до того, как они возникли. Четвёртый просто подтверждает выбор без давления.
+        </div>
+      </div>
+      <div class="process-item">
+        <div class="process-item-label">Ошибки: структура «что — почему — что делать»</div>
+        <div class="process-item-body">
+          Каждое сообщение проверяла по трём вопросам: <strong>что произошло</strong> (понятный заголовок без кодов), <strong>деньги в безопасности</strong> (особенно важно при техсбоях), <strong>конкретное следующее действие</strong> (не «обратитесь в поддержку», а «пополните карту» или «позвоните нам»). Технические коды убрала из видимого текста — они нужны поддержке, не пользователю.
+        </div>
+      </div>
+      <div class="process-item">
+        <div class="process-item-label">Тон во всех заданиях</div>
+        <div class="process-item-body">
+          Финансовый продукт требует спокойного доверительного тона — без восклицательных знаков, без срочности, без канцелярита. Пользователь доверяет банку деньги, и каждый текст должен это доверие поддерживать, а не разрушать. Даже сообщение об ошибке может звучать как забота, а не как обвинение.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="case-cta">
+  <div class="container">
+    <p>Понравился кейс? Посмотрите другие работы или напишите мне</p>
+    <div class="cta-btns">
+      <a href="index.html#cases" class="cta-btn-secondary">Все кейсы</a>
+      <a href="https://t.me/mashakazak" class="cta-btn-primary">Написать в Telegram</a>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-name">Маша Казак</div>
+      <div class="footer-sub">UX-редактор · Москва</div>
+    </div>
+    <div class="footer-contacts">
+      <a href="mailto:Cassaque@gmail.com" class="footer-contact">Cassaque@gmail.com</a>
+      <a href="https://t.me/mashakazak" class="footer-contact">@mashakazak</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 10));
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+  }, { threshold: 0.07 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+</body>
+</html>

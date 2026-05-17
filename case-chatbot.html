@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Сценарий чат-бота для банка | Маша Казак</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-secondary: #f7f7f5;
+    --ink: #1a1a1a;
+    --ink-soft: #555;
+    --ink-muted: #999;
+    --accent: #2563eb;
+    --accent-bg: #eff6ff;
+    --line: #e8e8e4;
+    --radius: 12px;
+    --sans: 'Inter', -apple-system, sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 48px; height: 60px;
+    background: rgba(255,255,255,0.92); backdrop-filter: blur(16px);
+    border-bottom: 1px solid transparent; transition: border-color .2s;
+  }
+  nav.scrolled { border-bottom-color: var(--line); }
+  .nav-logo { font-size: 15px; font-weight: 600; color: var(--ink); text-decoration: none; }
+  .nav-back { font-size: 13px; font-weight: 500; color: var(--ink-soft); text-decoration: none; display: flex; align-items: center; gap: 6px; transition: color .15s; }
+  .nav-back:hover { color: var(--ink); }
+  .btn { background: var(--ink); color: #fff !important; padding: 7px 16px; border-radius: 6px; font-size: 13px; font-weight: 500; text-decoration: none; transition: opacity .15s; }
+  .btn:hover { opacity: .8; }
+
+  /* LAYOUT */
+  .container { max-width: 780px; margin: 0 auto; padding: 0 48px; }
+  .container-wide { max-width: 1080px; margin: 0 auto; padding: 0 48px; }
+
+  /* HERO */
+  .case-hero { padding: 120px 0 64px; border-bottom: 1px solid var(--line); }
+  .case-eyebrow { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 20px; opacity: 0; animation: fadeUp .5s ease forwards .1s; }
+  .case-hero h1 { font-size: clamp(32px,4.5vw,52px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 20px; opacity: 0; animation: fadeUp .5s ease forwards .2s; }
+  .case-hero-desc { font-size: 17px; line-height: 1.75; color: var(--ink-soft); margin-bottom: 40px; max-width: 600px; opacity: 0; animation: fadeUp .5s ease forwards .3s; }
+  .case-meta { display: flex; gap: 32px; flex-wrap: wrap; opacity: 0; animation: fadeUp .5s ease forwards .4s; }
+  .meta-item { display: flex; flex-direction: column; gap: 4px; }
+  .meta-label { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-muted); }
+  .meta-val { font-size: 14px; font-weight: 600; }
+
+  /* TASK NAV */
+  .task-nav { display: flex; gap: 8px; padding: 32px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .task-nav a { font-size: 13px; font-weight: 500; color: var(--ink-soft); text-decoration: none; padding: 6px 14px; border-radius: 6px; background: var(--bg-secondary); border: 1px solid var(--line); transition: all .15s; }
+  .task-nav a:hover { border-color: #ccc; color: var(--ink); }
+
+  /* SECTIONS */
+  .task-section { padding: 72px 0; border-bottom: 1px solid var(--line); }
+  .task-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 16px; }
+  .task-section h2 { font-size: clamp(24px,3vw,34px); font-weight: 700; letter-spacing: -0.025em; line-height: 1.2; margin-bottom: 20px; }
+  .task-section p { font-size: 15px; line-height: 1.75; color: var(--ink-soft); margin-bottom: 16px; }
+  .task-section p:last-child { margin-bottom: 0; }
+
+  /* THINKING */
+  .thinking { background: var(--bg-secondary); border-left: 3px solid var(--accent); border-radius: 0 var(--radius) var(--radius) 0; padding: 24px 28px; margin: 32px 0; }
+  .thinking-title { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
+  .thinking p { font-size: 14px; line-height: 1.75; color: var(--ink-soft); margin-bottom: 10px; }
+  .thinking p:last-child { margin-bottom: 0; }
+
+  /* TASK BRIEF */
+  .brief-card {
+    background: var(--bg-secondary); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 32px; margin: 32px 0;
+  }
+  .brief-title { font-size: 16px; font-weight: 700; margin-bottom: 20px; letter-spacing: -0.01em; }
+  .brief-items { display: flex; flex-direction: column; gap: 14px; }
+  .brief-item { display: grid; grid-template-columns: 140px 1fr; gap: 16px; font-size: 14px; }
+  .brief-key { font-weight: 600; color: var(--ink-muted); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; padding-top: 2px; }
+  .brief-val { color: var(--ink-soft); line-height: 1.6; }
+  .brief-val strong { color: var(--ink); font-weight: 600; }
+
+  /* PERSONAS */
+  .personas { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 32px 0; }
+  .persona-card { background: var(--bg-secondary); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; }
+  .persona-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 14px; }
+  .persona-name { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .persona-role { font-size: 12px; color: var(--accent); font-weight: 500; margin-bottom: 12px; }
+  .persona-desc { font-size: 13px; line-height: 1.65; color: var(--ink-soft); }
+
+  /* CHAT MOCKUP */
+  .chat-wrap { margin: 40px 0; display: grid; grid-template-columns: 340px 1fr; gap: 32px; align-items: start; }
+  .chat-phone {
+    background: #1a1a1a; border-radius: 28px; padding: 16px;
+    position: sticky; top: 80px;
+  }
+  .chat-phone-bar { display: flex; align-items: center; justify-content: space-between; padding: 4px 4px 12px; }
+  .chat-phone-time { font-size: 12px; font-weight: 600; color: rgba(255,255,255,.8); }
+  .chat-screen { background: #f0f2f5; border-radius: 16px; overflow: hidden; }
+  .chat-header {
+    background: #fff; padding: 14px 16px; display: flex; align-items: center; gap: 12px;
+    border-bottom: 1px solid #eee;
+  }
+  .chat-bot-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .chat-bot-name { font-size: 13px; font-weight: 700; color: #1a1a1a; }
+  .chat-bot-status { font-size: 11px; color: #22c55e; font-weight: 500; }
+  .chat-messages { padding: 14px 12px; display: flex; flex-direction: column; gap: 8px; min-height: 400px; }
+
+  .msg { display: flex; flex-direction: column; gap: 2px; max-width: 85%; }
+  .msg.bot { align-self: flex-start; }
+  .msg.user { align-self: flex-end; }
+  .msg-bubble {
+    padding: 9px 13px; border-radius: 14px; font-size: 12px; line-height: 1.5;
+  }
+  .msg.bot .msg-bubble { background: #fff; color: #1a1a1a; border-bottom-left-radius: 4px; }
+  .msg.user .msg-bubble { background: var(--accent); color: #fff; border-bottom-right-radius: 4px; }
+  .msg-time { font-size: 10px; color: #999; padding: 0 4px; }
+  .msg.user .msg-time { text-align: right; }
+
+  .msg-buttons { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
+  .msg-btn {
+    background: #fff; border: 1px solid #ddd; border-radius: 10px;
+    padding: 8px 12px; font-size: 11px; font-weight: 500; color: var(--accent);
+    text-align: center; cursor: pointer;
+  }
+
+  /* SCENARIO DESCRIPTION */
+  .scenario-desc { flex: 1; }
+  .scenario-step {
+    background: var(--bg-secondary); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 24px 28px; margin-bottom: 12px;
+  }
+  .scenario-step:last-child { margin-bottom: 0; }
+  .step-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .step-num {
+    width: 28px; height: 28px; border-radius: 50%; background: var(--accent);
+    color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .step-name { font-size: 14px; font-weight: 700; }
+  .step-body { font-size: 13px; line-height: 1.7; color: var(--ink-soft); }
+  .step-body strong { color: var(--ink); font-weight: 600; }
+  .step-note { margin-top: 10px; font-size: 12px; color: var(--accent); font-weight: 500; }
+
+  /* VARIANTS TABLE */
+  .variants { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; margin: 32px 0; }
+  .variant-row { display: grid; grid-template-columns: 80px 1fr; border-bottom: 1px solid var(--line); }
+  .variant-row:last-child { border-bottom: none; }
+  .variant-num { padding: 20px; background: var(--bg-secondary); border-right: 1px solid var(--line); font-size: 12px; font-weight: 700; color: var(--ink-muted); display: flex; align-items: flex-start; }
+  .variant-content { padding: 20px 24px; }
+  .variant-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .variant-text { font-size: 13px; color: var(--ink-soft); line-height: 1.6; }
+  .variant-note { font-size: 12px; color: var(--accent); margin-top: 8px; font-weight: 500; }
+
+  /* FULL SCENARIO */
+  .full-scenario { margin: 40px 0; }
+  .scenario-node {
+    display: grid; grid-template-columns: 24px 1fr; gap: 16px; margin-bottom: 0;
+  }
+  .node-line { display: flex; flex-direction: column; align-items: center; }
+  .node-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); flex-shrink: 0; margin-top: 5px; }
+  .node-connector { width: 2px; background: var(--line); flex: 1; min-height: 24px; margin-top: 4px; }
+  .node-content { padding-bottom: 28px; }
+  .node-role { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 4px; }
+  .node-role.bot { color: var(--accent); }
+  .node-role.user { color: #7e22ce; }
+  .node-role.system { color: #166534; }
+  .node-text { font-size: 14px; line-height: 1.65; color: var(--ink); background: var(--bg-secondary); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; }
+  .node-text.bot-text { border-color: #bfdbfe; background: #eff6ff; }
+  .node-text.user-text { border-color: #e9d5ff; background: #faf5ff; }
+  .node-text.system-text { border-color: #bbf7d0; background: #f0fdf4; font-size: 12px; color: var(--ink-soft); }
+  .node-btns { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+  .node-btn { font-size: 12px; font-weight: 500; color: var(--accent); background: var(--bg); border: 1px solid #bfdbfe; padding: 4px 10px; border-radius: 6px; }
+  .branch-label { font-size: 11px; font-weight: 600; color: var(--ink-muted); margin: 4px 0 8px; text-transform: uppercase; letter-spacing: .06em; }
+
+  /* CORNER CASES */
+  .corner-cases { display: flex; flex-direction: column; gap: 12px; margin: 32px 0; }
+  .corner-case { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .corner-trigger { padding: 16px 20px; background: var(--bg-secondary); display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .corner-trigger-icon { font-size: 14px; }
+  .corner-trigger-text { font-size: 14px; font-weight: 600; }
+  .corner-trigger-tag { font-size: 11px; font-weight: 600; color: var(--accent); background: var(--accent-bg); padding: 2px 8px; border-radius: 4px; margin-left: auto; }
+  .corner-body { padding: 16px 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .corner-col-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-muted); margin-bottom: 8px; }
+  .corner-text { font-size: 13px; line-height: 1.65; color: var(--ink-soft); }
+
+  /* PROCESS */
+  .process-section { padding: 72px 0; }
+  .process-section h2 { font-size: clamp(24px,3vw,34px); font-weight: 700; letter-spacing: -0.025em; line-height: 1.2; margin-bottom: 40px; }
+  .process-items { display: flex; flex-direction: column; gap: 0; }
+  .process-item { display: grid; grid-template-columns: 200px 1fr; gap: 32px; padding: 32px 0; border-bottom: 1px solid var(--line); }
+  .process-item:last-child { border-bottom: none; }
+  .process-item-label { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; padding-top: 2px; }
+  .process-item-body { font-size: 14px; line-height: 1.75; color: var(--ink-soft); }
+  .process-item-body strong { color: var(--ink); font-weight: 600; }
+
+  /* CTA */
+  .case-cta { padding: 64px 0; text-align: center; }
+  .case-cta p { font-size: 16px; color: var(--ink-soft); margin-bottom: 24px; }
+  .cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .cta-btn-primary { background: var(--ink); color: #fff; padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none; transition: opacity .15s; }
+  .cta-btn-primary:hover { opacity: .85; }
+  .cta-btn-secondary { background: var(--bg-secondary); border: 1px solid var(--line); color: var(--ink); padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none; transition: border-color .15s; }
+  .cta-btn-secondary:hover { border-color: #ccc; }
+
+  /* FOOTER */
+  footer { padding: 48px 0; border-top: 1px solid var(--line); }
+  .footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; max-width: 1080px; margin: 0 auto; padding: 0 48px; }
+  .footer-name { font-size: 16px; font-weight: 700; letter-spacing: -0.02em; }
+  .footer-sub { font-size: 13px; color: var(--ink-muted); }
+  .footer-contacts { display: flex; gap: 20px; flex-wrap: wrap; }
+  .footer-contact { font-size: 13px; font-weight: 500; color: var(--ink-soft); text-decoration: none; transition: color .15s; }
+  .footer-contact:hover { color: var(--ink); }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+  .reveal { opacity:0; transform:translateY(14px); transition: opacity .5s ease, transform .5s ease; }
+  .reveal.visible { opacity:1; transform:translateY(0); }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    nav { padding: 0 24px; }
+    .container, .container-wide { padding: 0 24px; }
+    .chat-wrap { grid-template-columns: 1fr; }
+    .chat-phone { position: static; max-width: 340px; }
+    .process-item { grid-template-columns: 1fr; gap: 12px; }
+    .personas { grid-template-columns: 1fr; }
+    .corner-body { grid-template-columns: 1fr; }
+    .brief-item { grid-template-columns: 1fr; gap: 4px; }
+    footer .footer-inner { padding: 0 24px; }
+    .case-hero { padding: 100px 0 48px; }
+  }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <a href="index.html" class="nav-logo">Маша Казак</a>
+  <a href="index.html#cases" class="nav-back">← Все кейсы</a>
+  <a href="https://t.me/mashakazak" class="btn">Написать</a>
+</nav>
+
+<!-- HERO -->
+<div class="case-hero">
+  <div class="container">
+    <div class="case-eyebrow">Сценарий · Чат-бот</div>
+    <h1>Сценарий чат-бота для банка: блокировка карты</h1>
+    <p class="case-hero-desc">Тестовое задание: спроектировать диалог чат-бота для сценария «Заблокировать карту» — от первого сообщения до подтверждения. С ветвлениями, корнер-кейсами и разбором решений.</p>
+    <div class="case-meta">
+      <div class="meta-item">
+        <span class="meta-label">Формат</span>
+        <span class="meta-val">Тестовое задание</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Продукт</span>
+        <span class="meta-val">Чат-бот мобильного банка</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Сценарий</span>
+        <span class="meta-val">Блокировка карты</span>
+      </div>
+    </div>
+
+    <div class="task-nav">
+      <a href="#brief">Бриф</a>
+      <a href="#personas">Персоны</a>
+      <a href="#scenario">Сценарий</a>
+      <a href="#cornercases">Корнер-кейсы</a>
+      <a href="#process">Разбор</a>
+    </div>
+  </div>
+</div>
+
+<!-- BRIEF -->
+<div class="task-section" id="brief">
+  <div class="container">
+    <div class="task-eyebrow reveal">Задание</div>
+    <h2 class="reveal">Что нужно было сделать</h2>
+    <p class="reveal">Продуктовая команда банка запускает чат-бота в мобильном приложении. Первый сценарий — блокировка карты. Нужно спроектировать диалог: написать все реплики бота, кнопки и сообщения для нестандартных ситуаций.</p>
+
+    <div class="brief-card reveal">
+      <div class="brief-title">Бриф от команды</div>
+      <div class="brief-items">
+        <div class="brief-item">
+          <div class="brief-key">Продукт</div>
+          <div class="brief-val">Чат-бот в мобильном приложении банка. Работает 24/7, заменяет оператора в типовых сценариях.</div>
+        </div>
+        <div class="brief-item">
+          <div class="brief-key">Сценарий</div>
+          <div class="brief-val"><strong>Блокировка карты.</strong> Пользователь хочет заблокировать карту — потерял, украли или просто хочет временно ограничить операции.</div>
+        </div>
+        <div class="brief-item">
+          <div class="brief-key">Ограничения</div>
+          <div class="brief-val">Бот не может сам разблокировать карту — только заблокировать. Для разблокировки нужен звонок в поддержку или визит в отделение.</div>
+        </div>
+        <div class="brief-item">
+          <div class="brief-key">Tone of Voice</div>
+          <div class="brief-val">Спокойный, уверенный, без канцелярита. Бот — помощник, не робот. Не использует слова «осуществить», «произвести», «является».</div>
+        </div>
+        <div class="brief-item">
+          <div class="brief-key">Что сдать</div>
+          <div class="brief-val">Полный сценарий с ветвлениями, тексты всех реплик бота, варианты кнопок, сообщения для корнер-кейсов. Пояснения к решениям.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PERSONAS -->
+<div class="task-section" id="personas">
+  <div class="container">
+    <div class="task-eyebrow reveal">Персоны</div>
+    <h2 class="reveal">Кто обращается за блокировкой</h2>
+    <p class="reveal">Прежде чем писать диалог, я определила три основных типа пользователей — у каждого своё эмоциональное состояние и ожидания от бота.</p>
+
+    <div class="personas reveal">
+      <div class="persona-card">
+        <div class="persona-avatar" style="background:#fff3ef;">😰</div>
+        <div class="persona-name">Потерял / украли</div>
+        <div class="persona-role">Высокий стресс</div>
+        <div class="persona-desc">Паникует, хочет заблокировать прямо сейчас. Не готов читать длинные тексты и отвечать на много вопросов. Главное для него — скорость и уверенность, что деньги в безопасности.</div>
+      </div>
+      <div class="persona-card">
+        <div class="persona-avatar" style="background:#f0fdf4;">🛡️</div>
+        <div class="persona-name">Временная блокировка</div>
+        <div class="persona-role">Низкий стресс</div>
+        <div class="persona-desc">Уезжает в отпуск или просто хочет ограничить траты. Спокоен, хочет понять разницу между типами блокировки и выбрать подходящий. Важно объяснить последствия.</div>
+      </div>
+      <div class="persona-card">
+        <div class="persona-avatar" style="background:#eff6ff;">🤔</div>
+        <div class="persona-name">Подозрительная операция</div>
+        <div class="persona-role">Тревога + растерянность</div>
+        <div class="persona-desc">Увидел незнакомую транзакцию и хочет заблокировать карту на всякий случай. Нужна не только блокировка, но и инструкция — как оспорить операцию.</div>
+      </div>
+      <div class="persona-card">
+        <div class="persona-avatar" style="background:#faf5ff;">👴</div>
+        <div class="persona-name">Немолодой пользователь</div>
+        <div class="persona-role">Неуверенность в технологиях</div>
+        <div class="persona-desc">Боится сделать что-то не так. Нужны короткие сообщения, понятные слова и явное подтверждение каждого шага. Не давить, не торопить.</div>
+      </div>
+    </div>
+
+    <div class="thinking reveal">
+      <div class="thinking-title">Почему это важно</div>
+      <p>Блокировка карты — не рядовая операция. Человек либо в панике (потеря/кража), либо осторожно принимает решение (временная блокировка). Тон и скорость диалога должны подстраиваться под ситуацию — поэтому в начале я спрашиваю о причине.</p>
+      <p>Это не лишний шаг: ответ на вопрос «что случилось» определяет, что бот скажет дальше. Пользователю с кражей нужны другие следующие шаги, чем тому, кто просто уезжает в отпуск.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SCENARIO -->
+<div class="task-section" id="scenario">
+  <div class="container">
+    <div class="task-eyebrow reveal">Решение</div>
+    <h2 class="reveal">Полный сценарий диалога</h2>
+    <p class="reveal">Ниже — весь диалог с ветвлениями. Слева телефон с живым примером одной ветки (потеря карты), справа — структура с пояснениями.</p>
+  </div>
+
+  <div class="container-wide">
+    <div class="chat-wrap reveal">
+
+      <!-- PHONE -->
+      <div class="chat-phone">
+        <div class="chat-phone-bar">
+          <span class="chat-phone-time">9:41</span>
+        </div>
+        <div class="chat-screen">
+          <div class="chat-header">
+            <div class="chat-bot-avatar">🤖</div>
+            <div>
+              <div class="chat-bot-name">Помощник банка</div>
+              <div class="chat-bot-status">● онлайн</div>
+            </div>
+          </div>
+          <div class="chat-messages">
+
+            <div class="msg bot">
+              <div class="msg-bubble">Привет! Я помогу заблокировать карту прямо сейчас. Что случилось?</div>
+              <div class="msg-buttons">
+                <div class="msg-btn">Потерял карту</div>
+                <div class="msg-btn">Карту украли</div>
+                <div class="msg-btn">Хочу временно заблокировать</div>
+                <div class="msg-btn">Увидел подозрительную операцию</div>
+              </div>
+              <div class="msg-time">09:41</div>
+            </div>
+
+            <div class="msg user">
+              <div class="msg-bubble">Потерял карту</div>
+              <div class="msg-time">09:41</div>
+            </div>
+
+            <div class="msg bot">
+              <div class="msg-bubble">Понял. Какую карту блокируем?<br><br>•••• 4821 — Visa, основная<br>•••• 7743 — Mastercard</div>
+              <div class="msg-buttons">
+                <div class="msg-btn">•••• 4821</div>
+                <div class="msg-btn">•••• 7743</div>
+              </div>
+              <div class="msg-time">09:41</div>
+            </div>
+
+            <div class="msg user">
+              <div class="msg-bubble">•••• 4821</div>
+              <div class="msg-time">09:42</div>
+            </div>
+
+            <div class="msg bot">
+              <div class="msg-bubble">Заблокировать Visa •••• 4821?<br><br>После блокировки картой нельзя будет платить. Разблокировать можно только через звонок или в отделении.</div>
+              <div class="msg-buttons">
+                <div class="msg-btn">Да, заблокировать</div>
+                <div class="msg-btn">Отмена</div>
+              </div>
+              <div class="msg-time">09:42</div>
+            </div>
+
+            <div class="msg user">
+              <div class="msg-bubble">Да, заблокировать</div>
+              <div class="msg-time">09:42</div>
+            </div>
+
+            <div class="msg bot">
+              <div class="msg-bubble">✓ Карта Visa •••• 4821 заблокирована<br><br>Деньги на счёте в безопасности. Если найдёте карту — позвоните нам или зайдите в отделение.</div>
+              <div class="msg-buttons">
+                <div class="msg-btn">Заказать новую карту</div>
+                <div class="msg-btn">Позвонить в поддержку</div>
+                <div class="msg-btn">Готово, спасибо</div>
+              </div>
+              <div class="msg-time">09:42</div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- SCENARIO STEPS -->
+      <div class="scenario-desc">
+
+        <div class="scenario-step">
+          <div class="step-header">
+            <div class="step-num">1</div>
+            <div class="step-name">Приветствие и уточнение причины</div>
+          </div>
+          <div class="step-body">
+            Бот сразу переходит к делу — не здоровается несколько сообщений подряд. <strong>Четыре кнопки с причинами</strong> нужны не для статистики: ответ меняет финальный блок с рекомендациями. При краже — предлагаем написать заявление, при подозрительной операции — оспорить транзакцию.
+          </div>
+          <div class="step-note">Важно: не спрашиваем «чем могу помочь» — мы уже знаем, зачем пришёл пользователь (он нажал «Заблокировать карту»)</div>
+        </div>
+
+        <div class="scenario-step">
+          <div class="step-header">
+            <div class="step-num">2</div>
+            <div class="step-name">Выбор карты</div>
+          </div>
+          <div class="step-body">
+            Если у пользователя одна карта — этот шаг пропускается автоматически. Если несколько — показываем список с последними четырьмя цифрами и типом карты. <strong>Не называем карту по номеру полностью</strong> — это и безопасность, и читаемость.
+          </div>
+          <div class="step-note">Корнер-кейс: если карт нет — отдельное сообщение (см. ниже)</div>
+        </div>
+
+        <div class="scenario-step">
+          <div class="step-header">
+            <div class="step-num">3</div>
+            <div class="step-name">Подтверждение с предупреждением</div>
+          </div>
+          <div class="step-body">
+            Обязательный шаг перед необратимым действием. <strong>Коротко объясняем последствия</strong> — что платить нельзя, разблокировать только через оператора. Это снимает «я не знал» после блокировки. Кнопки — только «Заблокировать» и «Отмена», без нейтральных вариантов.
+          </div>
+          <div class="step-note">Тон: не пугаем, а информируем. «Разблокировать можно только через звонок» — факт, не угроза.</div>
+        </div>
+
+        <div class="scenario-step">
+          <div class="step-header">
+            <div class="step-num">4</div>
+            <div class="step-name">Подтверждение и следующие шаги</div>
+          </div>
+          <div class="step-body">
+            После блокировки — <strong>явное подтверждение и одна ключевая фраза про деньги</strong>. Пользователь в стрессе, и «деньги в безопасности» — это то, что он хочет услышать. Кнопки с дальнейшими действиями зависят от причины: при потере предлагаем заказать новую, при краже — ещё и написать заявление.
+          </div>
+          <div class="step-note">Не заканчиваем на «Ваш запрос обработан». Заканчиваем на действии или успокоении.</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- FULL SCENARIO TREE -->
+  <div class="container">
+    <h3 class="reveal" style="font-size:18px; font-weight:700; margin:56px 0 24px; letter-spacing:-0.02em;">Дерево сценария — ветки по причине</h3>
+
+    <div class="variants reveal">
+      <div class="variant-row">
+        <div class="variant-num">Потеря</div>
+        <div class="variant-content">
+          <div class="variant-title">Финальный блок после блокировки</div>
+          <div class="variant-text">«Деньги на счёте в безопасности. Если найдёте карту — позвоните нам или зайдите в отделение.»<br>Кнопки: Заказать новую карту · Позвонить в поддержку · Готово</div>
+          <div class="variant-note">Акцент на безопасности денег, предложение выпустить перевыпуск</div>
+        </div>
+      </div>
+      <div class="variant-row">
+        <div class="variant-num">Кража</div>
+        <div class="variant-content">
+          <div class="variant-title">Финальный блок после блокировки</div>
+          <div class="variant-text">«Карта заблокирована. Если с неё успели снять деньги — вы можете оспорить операции. Хотите, я покажу как?»<br>Кнопки: Оспорить операцию · Написать заявление · Позвонить</div>
+          <div class="variant-note">Добавляем путь для оспаривания — при краже это критично</div>
+        </div>
+      </div>
+      <div class="variant-row">
+        <div class="variant-num">Временная</div>
+        <div class="variant-content">
+          <div class="variant-title">Дополнительный шаг перед выбором карты</div>
+          <div class="variant-text">«На какой срок? Если уезжаете — можно включить ограничение на зарубежные операции, карта останется активной.»<br>Кнопки: Заблокировать полностью · Ограничить зарубежные операции</div>
+          <div class="variant-note">Предлагаем альтернативу — часто это именно то, что нужно</div>
+        </div>
+      </div>
+      <div class="variant-row">
+        <div class="variant-num">Подозрит.</div>
+        <div class="variant-content">
+          <div class="variant-title">Финальный блок после блокировки</div>
+          <div class="variant-text">«Карта заблокирована. Если операция прошла без вашего ведома — лучше её оспорить: так больше шансов вернуть деньги.»<br>Кнопки: Оспорить операцию · Позвонить в поддержку · Готово</div>
+          <div class="variant-note">Блокировка + следующий важный шаг (оспаривание)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CORNER CASES -->
+<div class="task-section" id="cornercases">
+  <div class="container">
+    <div class="task-eyebrow reveal">Корнер-кейсы</div>
+    <h2 class="reveal">Нестандартные ситуации</h2>
+    <p class="reveal">Хороший сценарий — это не только happy path. Я проработала шесть ситуаций, где пользователь может столкнуться с проблемой или неожиданным ответом.</p>
+
+    <div class="corner-cases reveal">
+
+      <div class="corner-case">
+        <div class="corner-trigger">
+          <span class="corner-trigger-icon">💳</span>
+          <span class="corner-trigger-text">У пользователя нет активных карт</span>
+          <span class="corner-trigger-tag">Пустое состояние</span>
+        </div>
+        <div class="corner-body">
+          <div>
+            <div class="corner-col-label">Ситуация</div>
+            <div class="corner-text">Пользователь зашёл в сценарий блокировки, но у него нет ни одной активной карты — все уже заблокированы или не выпущены.</div>
+          </div>
+          <div>
+            <div class="corner-col-label">Реплика бота</div>
+            <div class="corner-text">«У вас пока нет активных карт для блокировки. Если хотите — помогу заказать новую или соединю с оператором.»<br><br>Кнопки: Заказать карту · Позвонить в поддержку</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="corner-case">
+        <div class="corner-trigger">
+          <span class="corner-trigger-icon">⚙️</span>
+          <span class="corner-trigger-text">Техническая ошибка при блокировке</span>
+          <span class="corner-trigger-tag">Ошибка системы</span>
+        </div>
+        <div class="corner-body">
+          <div>
+            <div class="corner-col-label">Ситуация</div>
+            <div class="corner-text">Пользователь подтвердил блокировку, но система вернула ошибку. Карта не заблокирована.</div>
+          </div>
+          <div>
+            <div class="corner-col-label">Реплика бота</div>
+            <div class="corner-text">«Что-то пошло не так — карта пока не заблокирована. Попробуйте ещё раз или позвоните нам: заблокируем немедленно.»<br><br>Кнопки: Попробовать ещё раз · Позвонить (8-800-...)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="corner-case">
+        <div class="corner-trigger">
+          <span class="corner-trigger-icon">🤐</span>
+          <span class="corner-trigger-text">Пользователь молчит или пишет «не знаю»</span>
+          <span class="corner-trigger-tag">Нераспознанный ввод</span>
+        </div>
+        <div class="corner-body">
+          <div>
+            <div class="corner-col-label">Ситуация</div>
+            <div class="corner-text">Вместо выбора кнопки пользователь написал что-то непонятное или не ответил на вопрос о причине.</div>
+          </div>
+          <div>
+            <div class="corner-col-label">Реплика бота</div>
+            <div class="corner-text">«Не совсем понял. Выберите один из вариантов ниже — или позвоните нам, если что-то срочное.»<br><br>Кнопки повторяются. Максимум 2 попытки, затем — соединение с оператором.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="corner-case">
+        <div class="corner-trigger">
+          <span class="corner-trigger-icon">↩️</span>
+          <span class="corner-trigger-text">Пользователь хочет разблокировать карту</span>
+          <span class="corner-trigger-tag">Ограничение бота</span>
+        </div>
+        <div class="corner-body">
+          <div>
+            <div class="corner-col-label">Ситуация</div>
+            <div class="corner-text">После блокировки пользователь пишет «хочу разблокировать» или нажимает не ту кнопку.</div>
+          </div>
+          <div>
+            <div class="corner-col-label">Реплика бота</div>
+            <div class="corner-text">«Разблокировать карту я не могу — это только через оператора или в отделении. Позвонить прямо сейчас?»<br><br>Кнопки: Позвонить · Найти отделение · Не сейчас</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="corner-case">
+        <div class="corner-trigger">
+          <span class="corner-trigger-icon">🏦</span>
+          <span class="corner-trigger-text">Карта уже заблокирована</span>
+          <span class="corner-trigger-tag">Дубль действия</span>
+        </div>
+        <div class="corner-body">
+          <div>
+            <div class="corner-col-label">Ситуация</div>
+            <div class="corner-text">Пользователь пытается заблокировать карту, которую банк уже заблокировал — например, за подозрительные операции.</div>
+          </div>
+          <div>
+            <div class="corner-col-label">Реплика бота</div>
+            <div class="corner-text">«Эта карта уже заблокирована. Деньги на счёте в безопасности. Хотите узнать, что случилось?»<br><br>Кнопки: Узнать причину · Позвонить · Готово</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="corner-case">
+        <div class="corner-trigger">
+          <span class="corner-trigger-icon">🌙</span>
+          <span class="corner-trigger-text">Пользователь хочет выйти в середине сценария</span>
+          <span class="corner-trigger-tag">Прерывание</span>
+        </div>
+        <div class="corner-body">
+          <div>
+            <div class="corner-col-label">Ситуация</div>
+            <div class="corner-text">На любом шаге до финального подтверждения пользователь нажимает «Отмена» или пишет «стоп».</div>
+          </div>
+          <div>
+            <div class="corner-col-label">Реплика бота</div>
+            <div class="corner-text">«Хорошо, блокировку отменили. Если передумаете — просто напишите снова.»<br><br>Сессия закрывается. Никаких «вы уверены?» — пользователь уже принял решение.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- PROCESS -->
+<div class="process-section" id="process">
+  <div class="container">
+    <div class="task-eyebrow reveal">Разбор</div>
+    <h2 class="reveal">Как я думала над сценарием</h2>
+    <div class="process-items reveal">
+      <div class="process-item">
+        <div class="process-item-label">Сначала — персоны, потом — текст</div>
+        <div class="process-item-body">
+          Прежде чем написать первую реплику, я выделила типы пользователей и их эмоциональные состояния. <strong>Паника при краже и спокойствие при временной блокировке — разные диалоги.</strong> Именно поэтому вопрос о причине — не формальность, а развилка сценария.
+        </div>
+      </div>
+      <div class="process-item">
+        <div class="process-item-label">Минимум шагов, максимум ясности</div>
+        <div class="process-item-body">
+          Блокировка карты — срочное действие. Я убрала все лишние шаги: приветствие-вопрос-уточнение-подтверждение-подтверждение. <strong>Четыре шага — это максимум.</strong> Каждый шаг делает одно дело. Никаких «расскажите подробнее» и «уточните, пожалуйста».
+        </div>
+      </div>
+      <div class="process-item">
+        <div class="process-item-label">Подтверждение — обязательно</div>
+        <div class="process-item-body">
+          Блокировка необратима без звонка. Шаг с подтверждением защищает от случайных нажатий и снимает претензии «я не знал, что разблокировать нельзя». <strong>Важно: предупреждение — это факт, не угроза.</strong> «Разблокировать можно только через звонок» — информация, а не запугивание.
+        </div>
+      </div>
+      <div class="process-item">
+        <div class="process-item-label">«Деньги в безопасности» — ключевая фраза</div>
+        <div class="process-item-body">
+          При потере или краже пользователь думает не о карте — он думает о деньгах. <strong>Явное подтверждение «деньги на счёте в безопасности»</strong> снимает главную тревогу. Без этой фразы диалог технически правильный, но эмоционально пустой.
+        </div>
+      </div>
+      <div class="process-item">
+        <div class="process-item-label">ToV: помощник, не автоответчик</div>
+        <div class="process-item-body">
+          Я убрала все канцеляризмы: «осуществить блокировку» → «заблокировать», «ваш запрос принят» → «карта заблокирована». <strong>Бот говорит как человек, который знает что делает.</strong> Короткие предложения, активный залог, конкретика вместо абстракций.
+        </div>
+      </div>
+      <div class="process-item">
+        <div class="process-item-label">Корнер-кейсы — часть сценария, не исключение</div>
+        <div class="process-item-body">
+          Ошибки системы, молчание пользователя, попытка разблокировать — всё это предсказуемо. <strong>Хороший сценарий обрабатывает их заранее,</strong> а не оставляет пользователя с пустым экраном или «Произошла ошибка». Каждый корнер-кейс заканчивается конкретным следующим шагом.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="case-cta">
+  <div class="container">
+    <p>Понравился кейс? Посмотрите другие работы или напишите мне</p>
+    <div class="cta-btns">
+      <a href="index.html#cases" class="cta-btn-secondary">Все кейсы</a>
+      <a href="https://t.me/mashakazak" class="cta-btn-primary">Написать в Telegram</a>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-name">Маша Казак</div>
+      <div class="footer-sub">UX-редактор · Москва</div>
+    </div>
+    <div class="footer-contacts">
+      <a href="mailto:Cassaque@gmail.com" class="footer-contact">Cassaque@gmail.com</a>
+      <a href="https://t.me/mashakazak" class="footer-contact">@mashakazak</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 10));
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+  }, { threshold: 0.07 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
