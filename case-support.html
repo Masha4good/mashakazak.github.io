@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Шаблоны поддержки банка | Маша Казак</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-secondary: #f7f7f5;
+    --ink: #1a1a1a;
+    --ink-soft: #555;
+    --ink-muted: #999;
+    --accent: #2563eb;
+    --accent-bg: #eff6ff;
+    --line: #e8e8e4;
+    --radius: 12px;
+    --sans: 'Inter', -apple-system, sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 48px; height: 60px; background: rgba(255,255,255,0.92); backdrop-filter: blur(16px); border-bottom: 1px solid transparent; transition: border-color .2s; }
+  nav.scrolled { border-bottom-color: var(--line); }
+  .nav-logo { font-size: 15px; font-weight: 600; color: var(--ink); text-decoration: none; }
+  .nav-back { font-size: 13px; font-weight: 500; color: var(--ink-soft); text-decoration: none; transition: color .15s; }
+  .nav-back:hover { color: var(--ink); }
+  .btn { background: var(--ink); color: #fff !important; padding: 7px 16px; border-radius: 6px; font-size: 13px; font-weight: 500; text-decoration: none; transition: opacity .15s; }
+  .btn:hover { opacity: .8; }
+
+  .container { max-width: 780px; margin: 0 auto; padding: 0 48px; }
+  .container-wide { max-width: 1080px; margin: 0 auto; padding: 0 48px; }
+
+  .case-hero { padding: 120px 0 64px; border-bottom: 1px solid var(--line); }
+  .case-eyebrow { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 20px; opacity: 0; animation: fadeUp .5s ease forwards .1s; }
+  .case-hero h1 { font-size: clamp(32px,4.5vw,52px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 20px; opacity: 0; animation: fadeUp .5s ease forwards .2s; }
+  .case-hero-desc { font-size: 17px; line-height: 1.75; color: var(--ink-soft); margin-bottom: 40px; max-width: 600px; opacity: 0; animation: fadeUp .5s ease forwards .3s; }
+  .case-meta { display: flex; gap: 32px; flex-wrap: wrap; opacity: 0; animation: fadeUp .5s ease forwards .4s; }
+  .meta-item { display: flex; flex-direction: column; gap: 4px; }
+  .meta-label { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-muted); }
+  .meta-val { font-size: 14px; font-weight: 600; }
+
+  .task-nav { display: flex; gap: 8px; padding: 32px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .task-nav a { font-size: 13px; font-weight: 500; color: var(--ink-soft); text-decoration: none; padding: 6px 14px; border-radius: 6px; background: var(--bg-secondary); border: 1px solid var(--line); transition: all .15s; }
+  .task-nav a:hover { border-color: #ccc; color: var(--ink); }
+
+  .task-section { padding: 72px 0; border-bottom: 1px solid var(--line); }
+  .task-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 16px; }
+  .task-section h2 { font-size: clamp(24px,3vw,34px); font-weight: 700; letter-spacing: -0.025em; line-height: 1.2; margin-bottom: 20px; }
+  .task-section h3 { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; margin: 40px 0 16px; }
+  .task-section p { font-size: 15px; line-height: 1.75; color: var(--ink-soft); margin-bottom: 16px; }
+  .task-section p:last-child { margin-bottom: 0; }
+
+  .thinking { background: var(--bg-secondary); border-left: 3px solid var(--accent); border-radius: 0 var(--radius) var(--radius) 0; padding: 24px 28px; margin: 32px 0; }
+  .thinking-title { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
+  .thinking p { font-size: 14px; line-height: 1.75; color: var(--ink-soft); margin-bottom: 10px; }
+  .thinking p:last-child { margin-bottom: 0; }
+
+  /* PRINCIPLES */
+  .principles-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin: 32px 0; }
+  .principle-card { background: var(--bg-secondary); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; }
+  .principle-num { font-size: 28px; font-weight: 700; color: var(--accent); letter-spacing: -0.03em; margin-bottom: 10px; opacity: .4; }
+  .principle-title { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+  .principle-desc { font-size: 13px; line-height: 1.65; color: var(--ink-soft); }
+
+  /* CHAT MOCKUP */
+  .chat-section { margin: 40px 0; }
+  .chat-section-title { font-size: 14px; font-weight: 700; color: var(--ink-muted); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+
+  .ba-chat { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 32px; }
+  .chat-mock { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .chat-mock.before { border-color: #fecaca; }
+  .chat-mock.after { border-color: #bbf7d0; }
+  .chat-mock-label { padding: 10px 16px; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; border-bottom: 1px solid var(--line); }
+  .chat-mock.before .chat-mock-label { background: #fff5f5; color: #991b1b; }
+  .chat-mock.after .chat-mock-label { background: #f0fdf4; color: #166534; }
+  .chat-messages { padding: 16px; display: flex; flex-direction: column; gap: 10px; background: #f5f5f3; }
+
+  .msg { display: flex; flex-direction: column; gap: 2px; max-width: 88%; }
+  .msg.support { align-self: flex-start; }
+  .msg.user { align-self: flex-end; }
+  .msg-bubble { padding: 10px 14px; border-radius: 14px; font-size: 13px; line-height: 1.55; }
+  .msg.support .msg-bubble { background: #fff; color: var(--ink); border-bottom-left-radius: 4px; }
+  .msg.user .msg-bubble { background: var(--accent); color: #fff; border-bottom-right-radius: 4px; }
+  .msg-time { font-size: 10px; color: var(--ink-muted); padding: 0 4px; }
+  .msg.user .msg-time { text-align: right; }
+
+  .chat-note { font-size: 12px; color: var(--accent); font-weight: 500; padding: 10px 16px; border-top: 1px solid var(--line); background: var(--bg-secondary); }
+  .chat-note.red { color: #dc2626; background: #fff5f5; border-top-color: #fecaca; }
+
+  /* TEMPLATES LIST */
+  .templates-section { margin: 40px 0; }
+  .template-group { margin-bottom: 40px; }
+  .template-group-title { font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+
+  .template-item { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; margin-bottom: 12px; }
+  .template-header { padding: 14px 20px; background: var(--bg-secondary); border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 10px; }
+  .template-situation { font-size: 13px; font-weight: 600; flex: 1; }
+  .template-tag { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 4px; white-space: nowrap; }
+  .tag-error { background: #fff5f5; color: #dc2626; border: 1px solid #fecaca; }
+  .tag-refusal { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
+  .tag-tech { background: #faf5ff; color: #7e22ce; border: 1px solid #e9d5ff; }
+  .template-body { padding: 16px 20px; font-size: 14px; line-height: 1.7; color: var(--ink-soft); }
+  .template-body strong { color: var(--ink); }
+  .template-var { display: inline; background: #eff6ff; color: var(--accent); font-size: 12px; font-weight: 600; padding: 1px 6px; border-radius: 4px; }
+
+  /* PROCESS */
+  .process-section { padding: 72px 0; }
+  .process-section h2 { font-size: clamp(24px,3vw,34px); font-weight: 700; letter-spacing: -0.025em; line-height: 1.2; margin-bottom: 40px; }
+  .process-items { display: flex; flex-direction: column; }
+  .process-item { display: grid; grid-template-columns: 200px 1fr; gap: 32px; padding: 32px 0; border-bottom: 1px solid var(--line); }
+  .process-item:last-child { border-bottom: none; }
+  .process-item-label { font-size: 14px; font-weight: 600; padding-top: 2px; }
+  .process-item-body { font-size: 14px; line-height: 1.75; color: var(--ink-soft); }
+  .process-item-body strong { color: var(--ink); font-weight: 600; }
+
+  .case-cta { padding: 64px 0; text-align: center; }
+  .case-cta p { font-size: 16px; color: var(--ink-soft); margin-bottom: 24px; }
+  .cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .cta-btn-primary { background: var(--ink); color: #fff; padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none; transition: opacity .15s; }
+  .cta-btn-primary:hover { opacity: .85; }
+  .cta-btn-secondary { background: var(--bg-secondary); border: 1px solid var(--line); color: var(--ink); padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none; transition: border-color .15s; }
+  .cta-btn-secondary:hover { border-color: #ccc; }
+
+  footer { padding: 48px 0; border-top: 1px solid var(--line); }
+  .footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; max-width: 1080px; margin: 0 auto; padding: 0 48px; }
+  .footer-name { font-size: 16px; font-weight: 700; }
+  .footer-sub { font-size: 13px; color: var(--ink-muted); }
+  .footer-contacts { display: flex; gap: 20px; }
+  .footer-contact { font-size: 13px; font-weight: 500; color: var(--ink-soft); text-decoration: none; transition: color .15s; }
+  .footer-contact:hover { color: var(--ink); }
+
+  @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+  .reveal { opacity:0; transform:translateY(14px); transition: opacity .5s ease, transform .5s ease; }
+  .reveal.visible { opacity:1; transform:translateY(0); }
+
+  @media (max-width: 900px) {
+    nav { padding: 0 24px; }
+    .container, .container-wide { padding: 0 24px; }
+    .principles-grid { grid-template-columns: 1fr; }
+    .ba-chat { grid-template-columns: 1fr; }
+    .process-item { grid-template-columns: 1fr; gap: 12px; }
+    footer .footer-inner { padding: 0 24px; flex-direction: column; align-items: flex-start; }
+    .case-hero { padding: 100px 0 48px; }
+  }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <a href="index.html" class="nav-logo">Маша Казак</a>
+  <a href="index.html#cases" class="nav-back">← Все кейсы</a>
+  <a href="https://t.me/mashakazak" class="btn">Написать</a>
+</nav>
+
+<!-- HERO -->
+<div class="case-hero">
+  <div class="container">
+    <div class="case-eyebrow">Сервисные тексты · Банк</div>
+    <h1>Шаблоны чата поддержки:<br>ошибки и отказы</h1>
+    <p class="case-hero-desc">Продуктовая задача: написать шаблоны ответов для операторов службы поддержки банка в чате приложения. Категория — ошибки при операциях и отказы.</p>
+    <div class="case-meta">
+      <div class="meta-item">
+        <span class="meta-label">Канал</span>
+        <span class="meta-val">Чат в приложении</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Категория</span>
+        <span class="meta-val">Ошибки и отказы</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Аудитория</span>
+        <span class="meta-val">Операторы поддержки + клиенты</span>
+      </div>
+    </div>
+    <div class="task-nav">
+      <a href="#principles">Принципы</a>
+      <a href="#before-after">До / после</a>
+      <a href="#templates">Шаблоны</a>
+      <a href="#process">Разбор</a>
+    </div>
+  </div>
+</div>
+
+<!-- PRINCIPLES -->
+<div class="task-section" id="principles">
+  <div class="container">
+    <div class="task-eyebrow reveal">Принципы</div>
+    <h2 class="reveal">Как устроены шаблоны</h2>
+    <p class="reveal">Прежде чем писать тексты, я определила правила — что должен делать каждый шаблон в момент, когда пользователь оказался в стрессовой ситуации.</p>
+
+    <div class="principles-grid reveal">
+      <div class="principle-card">
+        <div class="principle-num">01</div>
+        <div class="principle-title">Деньги в безопасности — сказать сразу</div>
+        <div class="principle-desc">При любой финансовой ошибке первый вопрос пользователя — «мои деньги пропали?». Ответ на этот вопрос должен быть в первом предложении, а не в конце сообщения.</div>
+      </div>
+      <div class="principle-card">
+        <div class="principle-num">02</div>
+        <div class="principle-title">Что случилось + что делать</div>
+        <div class="principle-desc">Каждый шаблон отвечает на два вопроса: что произошло (кратко, без технических деталей) и что делать дальше (один конкретный шаг, не список). Без одного из них шаблон неполный.</div>
+      </div>
+      <div class="principle-card">
+        <div class="principle-num">03</div>
+        <div class="principle-title">Без канцелярита и пассивного залога</div>
+        <div class="principle-desc">«Операция не может быть выполнена» → «не получилось». «Осуществить перевод» → «перевести». «Является» — никогда. Активный залог, короткие предложения, живой язык.</div>
+      </div>
+      <div class="principle-card">
+        <div class="principle-num">04</div>
+        <div class="principle-title">Не обвинять пользователя</div>
+        <div class="principle-desc">«Вы ввели неверные данные» звучит как обвинение. «Данные не совпадают — проверьте» — это помощь. Разница в субъекте: не «вы сделали неправильно», а «вот что можно сделать».</div>
+      </div>
+      <div class="principle-card">
+        <div class="principle-num">05</div>
+        <div class="principle-title">Один следующий шаг</div>
+        <div class="principle-desc">Стрессовый пользователь не читает списки. Шаблон должен давать один чёткий следующий шаг — попробовать снова, позвонить, написать нам. Не три варианта сразу.</div>
+      </div>
+      <div class="principle-card">
+        <div class="principle-num">06</div>
+        <div class="principle-title">Тон: спокойный партнёр</div>
+        <div class="principle-desc">Не извиняться за каждую ошибку («Приносим искренние извинения за причинённые неудобства»), но и не быть холодным роботом. Тон как у коллеги, который знает что делает.</div>
+      </div>
+    </div>
+
+    <div class="thinking reveal">
+      <div class="thinking-title">Почему шаблоны поддержки — это редакторская задача</div>
+      <p>Сообщение об ошибке — это не технический текст. Это момент максимального стресса пользователя: что-то пошло не так с его деньгами. То, что он прочитает в этот момент, формирует его доверие к банку на недели вперёд.</p>
+      <p>Плохой шаблон превращает техническую проблему в личный конфликт. Хороший шаблон превращает её в момент заботы — «мы видим проблему, деньги в безопасности, вот следующий шаг».</p>
+    </div>
+  </div>
+</div>
+
+<!-- BEFORE/AFTER -->
+<div class="task-section" id="before-after">
+  <div class="container">
+    <div class="task-eyebrow reveal">До / после</div>
+    <h2 class="reveal">Как менялись тексты</h2>
+    <p class="reveal">Четыре типичных ситуации — и то, как шаблоны звучат до и после редактуры.</p>
+  </div>
+
+  <div class="container-wide">
+
+    <!-- 1 -->
+    <div class="chat-section reveal">
+      <div class="chat-section-title">Техническая ошибка при переводе</div>
+      <div class="ba-chat">
+        <div class="chat-mock before">
+          <div class="chat-mock-label">Было</div>
+          <div class="chat-messages">
+            <div class="msg user">
+              <div class="msg-bubble">Перевод не прошёл, что случилось?</div>
+              <div class="msg-time">14:23</div>
+            </div>
+            <div class="msg support">
+              <div class="msg-bubble">Уважаемый клиент! Приносим извинения за возникшие неудобства. К сожалению, в настоящее время операция перевода денежных средств не может быть выполнена в связи с техническим сбоем в работе системы. Просим вас повторить попытку позднее.</div>
+              <div class="msg-time">14:24</div>
+            </div>
+          </div>
+          <div class="chat-note red">Пассивный залог, канцелярит, нет ответа про деньги, нет конкретного следующего шага</div>
+        </div>
+        <div class="chat-mock after">
+          <div class="chat-mock-label">Стало</div>
+          <div class="chat-messages">
+            <div class="msg user">
+              <div class="msg-bubble">Перевод не прошёл, что случилось?</div>
+              <div class="msg-time">14:23</div>
+            </div>
+            <div class="msg support">
+              <div class="msg-bubble">Перевод не ушёл — деньги остались на вашем счёте. Что-то пошло не так на нашей стороне, уже разбираемся. Попробуйте повторить через несколько минут — или напишите нам, если не получится.</div>
+              <div class="msg-time">14:24</div>
+            </div>
+          </div>
+          <div class="chat-note">Деньги упомянуты сразу. Ответственность взята на себя. Один следующий шаг.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2 -->
+    <div class="chat-section reveal">
+      <div class="chat-section-title">Отказ в кредите</div>
+      <div class="ba-chat">
+        <div class="chat-mock before">
+          <div class="chat-mock-label">Было</div>
+          <div class="chat-messages">
+            <div class="msg user">
+              <div class="msg-bubble">Мне отказали в кредите, почему?</div>
+              <div class="msg-time">11:05</div>
+            </div>
+            <div class="msg support">
+              <div class="msg-bubble">Уважаемый клиент, ваша заявка на кредит была рассмотрена и по результатам проверки было принято решение об отказе в предоставлении кредитного продукта. Причины отказа не раскрываются в соответствии с политикой банка.</div>
+              <div class="msg-time">11:06</div>
+            </div>
+          </div>
+          <div class="chat-note red">«Кредитный продукт» — канцелярит. Нет эмпатии. Нет следующего шага. Звучит как приговор.</div>
+        </div>
+        <div class="chat-mock after">
+          <div class="chat-mock-label">Стало</div>
+          <div class="chat-messages">
+            <div class="msg user">
+              <div class="msg-bubble">Мне отказали в кредите, почему?</div>
+              <div class="msg-time">11:05</div>
+            </div>
+            <div class="msg support">
+              <div class="msg-bubble">Мы рассмотрели заявку и пока не можем одобрить кредит. К сожалению, причину не раскрываем — это стандартная практика. Попробовать снова можно через 3 месяца.</div>
+              <div class="msg-time">11:06</div>
+            </div>
+          </div>
+          <div class="chat-note">«Пока не можем» мягче, чем окончательный отказ. Есть временная рамка — это даёт надежду.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 -->
+    <div class="chat-section reveal">
+      <div class="chat-section-title">Карта заблокирована из-за подозрительной операции</div>
+      <div class="ba-chat">
+        <div class="chat-mock before">
+          <div class="chat-mock-label">Было</div>
+          <div class="chat-messages">
+            <div class="msg user">
+              <div class="msg-bubble">Карта не работает, что происходит?</div>
+              <div class="msg-time">19:42</div>
+            </div>
+            <div class="msg support">
+              <div class="msg-bubble">Ваша карта была заблокирована системой безопасности банка в связи с выявлением подозрительной активности. Для разблокировки карты необходимо обратиться в отделение банка или позвонить на горячую линию.</div>
+              <div class="msg-time">19:43</div>
+            </div>
+          </div>
+          <div class="chat-note red">Пассивный залог. Пугающий тон без объяснения. Нет уточнения — деньги целы?</div>
+        </div>
+        <div class="chat-mock after">
+          <div class="chat-mock-label">Стало</div>
+          <div class="chat-messages">
+            <div class="msg user">
+              <div class="msg-bubble">Карта не работает, что происходит?</div>
+              <div class="msg-time">19:42</div>
+            </div>
+            <div class="msg support">
+              <div class="msg-bubble">Мы остановили эту операцию — она показалась нам необычной. Если вы её инициировали, позвоните нам по номеру на обороте карты, разберёмся за минуту.</div>
+              <div class="msg-time">19:43</div>
+            </div>
+          </div>
+          <div class="chat-note">Объяснение без обвинений. Конкретное действие. «За минуту» снижает тревогу.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 -->
+    <div class="chat-section reveal">
+      <div class="chat-section-title">Не приходит SMS с кодом</div>
+      <div class="ba-chat">
+        <div class="chat-mock before">
+          <div class="chat-mock-label">Было</div>
+          <div class="chat-messages">
+            <div class="msg user">
+              <div class="msg-bubble">Не приходит код подтверждения</div>
+              <div class="msg-time">10:17</div>
+            </div>
+            <div class="msg support">
+              <div class="msg-bubble">Уважаемый клиент! SMS-сообщение с кодом подтверждения может поступить с задержкой. Рекомендуем осуществить повторный запрос кода или проверить корректность номера телефона, привязанного к вашему аккаунту.</div>
+              <div class="msg-time">10:18</div>
+            </div>
+          </div>
+          <div class="chat-note red">«Осуществить повторный запрос» — три слова вместо одного. Нет конкретики по времени ожидания.</div>
+        </div>
+        <div class="chat-mock after">
+          <div class="chat-mock-label">Стало</div>
+          <div class="chat-messages">
+            <div class="msg user">
+              <div class="msg-bubble">Не приходит код подтверждения</div>
+              <div class="msg-time">10:17</div>
+            </div>
+            <div class="msg support">
+              <div class="msg-bubble">Код может идти до 2 минут. Если не пришёл — запросите новый. Если снова не приходит, проверьте: оператор мог заблокировать номер для СМС.</div>
+              <div class="msg-time">10:18</div>
+            </div>
+          </div>
+          <div class="chat-note">Конкретное время. Два шага по порядку. Причина — без обвинений.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TEMPLATES -->
+<div class="task-section" id="templates">
+  <div class="container">
+    <div class="task-eyebrow reveal">Шаблоны</div>
+    <h2 class="reveal">Полный набор шаблонов</h2>
+    <p class="reveal">Переменные обозначены <span style="background:#eff6ff; color:var(--accent); font-size:13px; font-weight:600; padding:1px 6px; border-radius:4px;">{{вот так}}</span> — оператор подставляет нужное значение перед отправкой.</p>
+
+    <div class="templates-section reveal">
+
+      <div class="template-group">
+        <div class="template-group-title">Ошибки при переводе</div>
+
+        <div class="template-item">
+          <div class="template-header">
+            <div class="template-situation">Техническая ошибка на стороне банка</div>
+            <div class="template-tag tag-error">Ошибка</div>
+          </div>
+          <div class="template-body">
+            Перевод не ушёл — деньги остались на вашем счёте. Что-то пошло не так на нашей стороне, уже разбираемся. Попробуйте повторить через несколько минут — или напишите нам, если не получится.
+          </div>
+        </div>
+
+        <div class="template-item">
+          <div class="template-header">
+            <div class="template-situation">Неверные реквизиты получателя</div>
+            <div class="template-tag tag-error">Ошибка</div>
+          </div>
+          <div class="template-body">
+            Не удалось отправить перевод: такой карты не существует или она заблокирована. Деньги у вас — никуда не делись. Проверьте номер вместе с получателем и попробуйте ещё раз.
+          </div>
+        </div>
+
+        <div class="template-item">
+          <div class="template-header">
+            <div class="template-situation">Превышен суточный лимит</div>
+            <div class="template-tag tag-error">Ошибка</div>
+          </div>
+          <div class="template-body">
+            Вы уже перевели максимальную сумму за сегодня — <span class="template-var">{{сумма лимита}}</span> ₽. Лимит обновится в 00:00. Если нужно перевести больше — можем помочь его увеличить.
+          </div>
+        </div>
+
+        <div class="template-item">
+          <div class="template-header">
+            <div class="template-situation">Недостаточно средств</div>
+            <div class="template-tag tag-error">Ошибка</div>
+          </div>
+          <div class="template-body">
+            На карте не хватает <span class="template-var">{{сумма недостачи}}</span> ₽ для этого перевода. Пополните счёт или уменьшите сумму.
+          </div>
+        </div>
+
+      </div>
+
+      <div class="template-group">
+        <div class="template-group-title">Отказы по карте</div>
+
+        <div class="template-item">
+          <div class="template-header">
+            <div class="template-situation">Карта заблокирована — подозрительная операция</div>
+            <div class="template-tag tag-refusal">Отказ</div>
+          </div>
+          <div class="template-body">
+            Мы остановили эту операцию — она показалась нам необычной. Если вы её инициировали, позвоните нам по номеру на обороте карты, разберёмся за минуту.
+          </div>
+        </div>
+
+        <div class="template-item">
+          <div class="template-header">
+            <div class="template-situation">Карта заблокирована — по запросу клиента</div>
+            <div class="template-tag tag-refusal">Отказ</div>
+          </div>
+          <div class="template-body">
+            Карта <span class="template-var">{{последние 4 цифры}}</span> заблокирована. Деньги на счёте в безопасности. Чтобы разблокировать — позвоните нам или зайдите в отделение.
+          </div>
+        </div>
+
+        <div class="template-item">
+          <div class="template-header">
+            <div class="template-situation">Отказ в выпуске карты</div>
+            <div class="template-tag tag-refusal">Отказ</div>
+          </div>
+          <div class="template-body">
+            К сожалению, сейчас не можем выпустить карту. Это связано с внутренними проверками — мы не можем раскрыть детали. Попробуйте подать заявку повторно через 30 дней.
+          </div>
+        </div>
+
+      </div>
+
+      <div class="template-group">
+        <div class="template-group-title">Отказы по кредиту и рассрочке</div>
+
+        <div class="template-item">
+          <div class="template-header">
+            <div class="template-situation">Отказ в кредите</div>
+            <div class="template-tag tag-refusal">Отказ</div>
+          </div>
+          <div class="template-body">
+            Мы рассмотрели заявку и пока не можем одобрить кредит. К сожалению, причину не раскрываем — это стандартная практика. Попробовать снова можно через 3 месяца.
+          </div>
+        </div>
+
+        <div class="template-item">
+          <div class="template-header">
+            <div class="template-situation">Отказ в рассрочке на конкретную покупку</div>
+            <div class="template-tag tag-refusal">Отказ</div>
+          </div>
+          <div class="template-body">
+            Эта покупка не подходит для рассрочки. Зато можем предложить другие варианты — напишите, подберём.
+          </div>
+        </div>
+
+      </div>
+
+      <div class="template-group">
+        <div class="template-group-title">Технические ошибки приложения</div>
+
+        <div class="template-item">
+          <div class="template-header">
+            <div class="template-situation">Нет соединения / приложение не загружается</div>
+            <div class="template-tag tag-tech">Техническая</div>
+          </div>
+          <div class="template-body">
+            Похоже, нет соединения с интернетом. Проверьте сеть и попробуйте ещё раз. Если интернет есть, а приложение всё равно не открывается — напишите нам.
+          </div>
+        </div>
+
+        <div class="template-item">
+          <div class="template-header">
+            <div class="template-situation">Неверный пароль при входе</div>
+            <div class="template-tag tag-tech">Техническая</div>
+          </div>
+          <div class="template-body">
+            Неверный пароль. Осталось попыток: <span class="template-var">{{N}}</span>. После <span class="template-var">{{N}}</span> попыток вход заблокируется на 15 минут. Забыли пароль? Восстановим прямо здесь.
+          </div>
+        </div>
+
+        <div class="template-item">
+          <div class="template-header">
+            <div class="template-situation">Аккаунт временно заблокирован после ошибок входа</div>
+            <div class="template-tag tag-tech">Техническая</div>
+          </div>
+          <div class="template-body">
+            Слишком много неверных попыток — доступ временно закрыт на 15 минут. Это защита вашего счёта. Попробуйте позже или восстановите пароль прямо сейчас.
+          </div>
+        </div>
+
+        <div class="template-item">
+          <div class="template-header">
+            <div class="template-situation">Не приходит СМС с кодом</div>
+            <div class="template-tag tag-tech">Техническая</div>
+          </div>
+          <div class="template-body">
+            Код может идти до 2 минут. Если не пришёл — запросите новый. Если снова не приходит, проверьте: оператор мог заблокировать номер для СМС.
+          </div>
+        </div>
+
+        <div class="template-item">
+          <div class="template-header">
+            <div class="template-situation">Универсальный шаблон — операция не прошла</div>
+            <div class="template-tag tag-error">Ошибка</div>
+          </div>
+          <div class="template-body">
+            Операция не прошла. Деньги на счёте, ничего не списалось. Попробуйте ещё раз или напишите нам — разберёмся.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROCESS -->
+<div class="process-section" id="process">
+  <div class="container">
+    <div class="task-eyebrow reveal">Разбор</div>
+    <h2 class="reveal">Как я думала над шаблонами</h2>
+    <div class="process-items reveal">
+      <div class="process-item">
+        <div class="process-item-label">Начала с эмоции пользователя</div>
+        <div class="process-item-body">
+          Финансовая ошибка — это стресс. Не просто неудобство, а тревога: «что с моими деньгами?». <strong>Шаблон должен снять эту тревогу в первом предложении</strong> — прежде чем объяснять техническую причину. «Деньги на счёте» — это не вежливость, это необходимость.
+        </div>
+      </div>
+      <div class="process-item">
+        <div class="process-item-label">Убрала всё лишнее</div>
+        <div class="process-item-body">
+          «Уважаемый клиент», «приносим извинения за причинённые неудобства», «в соответствии с политикой банка» — это слова-пустышки. <strong>Они увеличивают длину сообщения и снижают доверие.</strong> Если банк правда заботится — он скажет это действием, а не формулой вежливости.
+        </div>
+      </div>
+      <div class="process-item">
+        <div class="process-item-label">Различила тип ситуации</div>
+        <div class="process-item-body">
+          Ошибка на стороне банка, ошибка пользователя и отказ — три разные ситуации с разным тоном. <strong>При ошибке банка — берём ответственность.</strong> При ошибке пользователя — помогаем без обвинений. При отказе — честно, без ложной надежды, но с временным горизонтом.
+        </div>
+      </div>
+      <div class="process-item">
+        <div class="process-item-label">Оставила переменные явными</div>
+        <div class="process-item-body">
+          Шаблоны с переменными {{сумма}}, {{N попыток}} легче поддерживать и труднее ошибиться при использовании. <strong>Оператор видит что нужно подставить</strong> — и не пропустит важную деталь. Это снижает количество ошибок в реальных ответах.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="case-cta">
+  <div class="container">
+    <p>Понравился кейс? Посмотрите другие работы или напишите мне</p>
+    <div class="cta-btns">
+      <a href="index.html#cases" class="cta-btn-secondary">Все кейсы</a>
+      <a href="https://t.me/mashakazak" class="cta-btn-primary">Написать в Telegram</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-name">Маша Казак</div>
+      <div class="footer-sub">UX-редактор · Москва</div>
+    </div>
+    <div class="footer-contacts">
+      <a href="mailto:Cassaque@gmail.com" class="footer-contact">Cassaque@gmail.com</a>
+      <a href="https://t.me/mashakazak" class="footer-contact">@mashakazak</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 10));
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+  }, { threshold: 0.07 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
