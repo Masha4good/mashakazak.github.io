@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ToV-гайдлайн сервиса доставки | Маша Казак</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-secondary: #f7f7f5;
+    --ink: #1a1a1a;
+    --ink-soft: #555;
+    --ink-muted: #999;
+    --accent: #2563eb;
+    --accent-bg: #eff6ff;
+    --line: #e8e8e4;
+    --radius: 12px;
+    --sans: 'Inter', -apple-system, sans-serif;
+    --brand: #FF6B35;
+    --brand-light: #fff4f0;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 48px; height: 60px; background: rgba(255,255,255,0.92); backdrop-filter: blur(16px); border-bottom: 1px solid transparent; transition: border-color .2s; }
+  nav.scrolled { border-bottom-color: var(--line); }
+  .nav-logo { font-size: 15px; font-weight: 600; color: var(--ink); text-decoration: none; }
+  .nav-back { font-size: 13px; font-weight: 500; color: var(--ink-soft); text-decoration: none; transition: color .15s; }
+  .nav-back:hover { color: var(--ink); }
+  .btn { background: var(--ink); color: #fff !important; padding: 7px 16px; border-radius: 6px; font-size: 13px; font-weight: 500; text-decoration: none; transition: opacity .15s; }
+  .btn:hover { opacity: .8; }
+
+  .container { max-width: 780px; margin: 0 auto; padding: 0 48px; }
+  .container-wide { max-width: 1080px; margin: 0 auto; padding: 0 48px; }
+
+  .case-hero { padding: 120px 0 64px; border-bottom: 1px solid var(--line); }
+  .case-eyebrow { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 20px; opacity: 0; animation: fadeUp .5s ease forwards .1s; }
+  .case-hero h1 { font-size: clamp(32px,4.5vw,52px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 20px; opacity: 0; animation: fadeUp .5s ease forwards .2s; }
+  .case-hero-desc { font-size: 17px; line-height: 1.75; color: var(--ink-soft); margin-bottom: 40px; max-width: 600px; opacity: 0; animation: fadeUp .5s ease forwards .3s; }
+  .case-meta { display: flex; gap: 32px; flex-wrap: wrap; opacity: 0; animation: fadeUp .5s ease forwards .4s; }
+  .meta-item { display: flex; flex-direction: column; gap: 4px; }
+  .meta-label { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-muted); }
+  .meta-val { font-size: 14px; font-weight: 600; }
+
+  .task-nav { display: flex; gap: 8px; padding: 32px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .task-nav a { font-size: 13px; font-weight: 500; color: var(--ink-soft); text-decoration: none; padding: 6px 14px; border-radius: 6px; background: var(--bg-secondary); border: 1px solid var(--line); transition: all .15s; }
+  .task-nav a:hover { border-color: #ccc; color: var(--ink); }
+
+  .task-section { padding: 72px 0; border-bottom: 1px solid var(--line); }
+  .task-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 16px; }
+  .task-section h2 { font-size: clamp(24px,3vw,34px); font-weight: 700; letter-spacing: -0.025em; line-height: 1.2; margin-bottom: 20px; }
+  .task-section p { font-size: 15px; line-height: 1.75; color: var(--ink-soft); margin-bottom: 16px; }
+  .task-section p:last-child { margin-bottom: 0; }
+
+  /* TOV DOCUMENT STYLES */
+  .tov-intro { background: var(--brand-light); border: 1px solid #ffd5c4; border-radius: var(--radius); padding: 28px 32px; margin: 32px 0; }
+  .tov-intro-label { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--brand); margin-bottom: 12px; }
+  .tov-intro p { font-size: 14px; line-height: 1.75; color: #7a3520; margin-bottom: 10px; }
+  .tov-intro p:last-child { margin-bottom: 0; }
+
+  /* CHARACTER */
+  .character-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; margin: 32px 0; }
+  .character-card { background: var(--bg-secondary); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; }
+  .character-icon { font-size: 28px; margin-bottom: 12px; }
+  .character-trait { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+  .character-desc { font-size: 13px; line-height: 1.65; color: var(--ink-soft); margin-bottom: 12px; }
+  .character-quote { font-size: 13px; font-style: italic; color: var(--brand); border-left: 2px solid var(--brand); padding-left: 12px; line-height: 1.6; }
+
+  /* SPECTRUM */
+  .spectrum { background: var(--bg-secondary); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px 28px; margin: 32px 0; }
+  .spectrum-title { font-size: 13px; font-weight: 700; margin-bottom: 16px; }
+  .spectrum-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .spectrum-row:last-child { margin-bottom: 0; }
+  .spectrum-label-left { font-size: 12px; font-weight: 600; color: var(--ink-muted); width: 110px; text-align: right; flex-shrink: 0; }
+  .spectrum-label-right { font-size: 12px; font-weight: 600; color: var(--ink-muted); width: 110px; flex-shrink: 0; }
+  .spectrum-track { flex: 1; height: 6px; background: #e0e0e0; border-radius: 3px; position: relative; }
+  .spectrum-fill { height: 100%; background: var(--brand); border-radius: 3px; }
+  .spectrum-dot { width: 14px; height: 14px; background: var(--brand); border-radius: 50%; position: absolute; top: -4px; border: 2px solid #fff; box-shadow: 0 0 0 1px var(--brand); }
+
+  /* RULES */
+  .rules-list { display: flex; flex-direction: column; gap: 0; margin: 32px 0; }
+  .rule-item { padding: 24px 0; border-bottom: 1px solid var(--line); }
+  .rule-item:last-child { border-bottom: none; }
+  .rule-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .rule-num { width: 28px; height: 28px; border-radius: 50%; background: var(--brand); color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .rule-title { font-size: 16px; font-weight: 700; }
+  .rule-desc { font-size: 14px; line-height: 1.75; color: var(--ink-soft); margin-bottom: 16px; }
+  .rule-examples { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .rule-ex { border-radius: 8px; overflow: hidden; border: 1px solid var(--line); }
+  .rule-ex.bad { border-color: #fecaca; }
+  .rule-ex.good { border-color: #bbf7d0; }
+  .rule-ex-label { padding: 6px 12px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+  .rule-ex.bad .rule-ex-label { background: #fff5f5; color: #dc2626; }
+  .rule-ex.good .rule-ex-label { background: #f0fdf4; color: #166534; }
+  .rule-ex-text { padding: 10px 12px; font-size: 13px; line-height: 1.6; color: var(--ink-soft); }
+
+  /* SITUATIONS */
+  .situations { display: flex; flex-direction: column; gap: 24px; margin: 32px 0; }
+  .situation { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .situation-header { padding: 14px 20px; background: var(--bg-secondary); border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 12px; }
+  .situation-icon { font-size: 18px; }
+  .situation-name { font-size: 14px; font-weight: 700; flex: 1; }
+  .situation-mood { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+  .mood-happy { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+  .mood-neutral { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
+  .mood-stress { background: #fff5f5; color: #dc2626; border: 1px solid #fecaca; }
+  .situation-body { display: grid; grid-template-columns: 1fr 1fr; }
+  .sit-col { padding: 16px 20px; }
+  .sit-col:first-child { border-right: 1px solid var(--line); }
+  .sit-col-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 10px; }
+  .sit-col.bad .sit-col-label { color: #dc2626; }
+  .sit-col.good .sit-col-label { color: #166534; }
+  .sit-text { font-size: 13px; line-height: 1.65; color: var(--ink-soft); }
+  .sit-note { font-size: 12px; color: var(--accent); font-weight: 500; margin-top: 8px; }
+  .sit-note.red { color: #dc2626; }
+
+  /* FORBIDDEN */
+  .forbidden-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; margin: 32px 0; }
+  .forbidden-item { background: #fff5f5; border: 1px solid #fecaca; border-radius: 10px; padding: 16px 18px; }
+  .forbidden-word { font-size: 14px; font-weight: 700; color: #dc2626; margin-bottom: 4px; }
+  .forbidden-why { font-size: 12px; color: #7f1d1d; line-height: 1.5; margin-bottom: 8px; }
+  .forbidden-instead { font-size: 12px; color: #166534; font-weight: 500; }
+  .forbidden-instead::before { content: '→ '; }
+
+  /* CHECKLIST */
+  .checklist { background: var(--bg-secondary); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px 28px; margin: 32px 0; }
+  .checklist-title { font-size: 14px; font-weight: 700; margin-bottom: 16px; }
+  .checklist-items { display: flex; flex-direction: column; gap: 10px; }
+  .checklist-item { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--ink-soft); line-height: 1.5; }
+  .checklist-box { width: 18px; height: 18px; border: 1.5px solid #ccc; border-radius: 4px; flex-shrink: 0; margin-top: 1px; }
+
+  /* PROCESS */
+  .process-section { padding: 72px 0; }
+  .process-section h2 { font-size: clamp(24px,3vw,34px); font-weight: 700; letter-spacing: -0.025em; line-height: 1.2; margin-bottom: 40px; }
+  .process-items { display: flex; flex-direction: column; }
+  .process-item { display: grid; grid-template-columns: 200px 1fr; gap: 32px; padding: 32px 0; border-bottom: 1px solid var(--line); }
+  .process-item:last-child { border-bottom: none; }
+  .process-item-label { font-size: 14px; font-weight: 600; padding-top: 2px; }
+  .process-item-body { font-size: 14px; line-height: 1.75; color: var(--ink-soft); }
+  .process-item-body strong { color: var(--ink); font-weight: 600; }
+
+  .case-cta { padding: 64px 0; text-align: center; }
+  .case-cta p { font-size: 16px; color: var(--ink-soft); margin-bottom: 24px; }
+  .cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .cta-btn-primary { background: var(--ink); color: #fff; padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none; transition: opacity .15s; }
+  .cta-btn-primary:hover { opacity: .85; }
+  .cta-btn-secondary { background: var(--bg-secondary); border: 1px solid var(--line); color: var(--ink); padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none; transition: border-color .15s; }
+  .cta-btn-secondary:hover { border-color: #ccc; }
+
+  footer { padding: 48px 0; border-top: 1px solid var(--line); }
+  .footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; max-width: 1080px; margin: 0 auto; padding: 0 48px; }
+  .footer-name { font-size: 16px; font-weight: 700; }
+  .footer-sub { font-size: 13px; color: var(--ink-muted); }
+  .footer-contacts { display: flex; gap: 20px; }
+  .footer-contact { font-size: 13px; font-weight: 500; color: var(--ink-soft); text-decoration: none; transition: color .15s; }
+  .footer-contact:hover { color: var(--ink); }
+
+  @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+  .reveal { opacity:0; transform:translateY(14px); transition: opacity .5s ease, transform .5s ease; }
+  .reveal.visible { opacity:1; transform:translateY(0); }
+
+  @media (max-width: 900px) {
+    nav { padding: 0 24px; }
+    .container, .container-wide { padding: 0 24px; }
+    .character-grid { grid-template-columns: 1fr; }
+    .rule-examples { grid-template-columns: 1fr; }
+    .situation-body { grid-template-columns: 1fr; }
+    .sit-col:first-child { border-right: none; border-bottom: 1px solid var(--line); }
+    .forbidden-grid { grid-template-columns: 1fr; }
+    .process-item { grid-template-columns: 1fr; gap: 12px; }
+    footer .footer-inner { padding: 0 24px; flex-direction: column; align-items: flex-start; }
+    .case-hero { padding: 100px 0 48px; }
+  }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <a href="index.html" class="nav-logo">Маша Казак</a>
+  <a href="index.html#cases" class="nav-back">← Все кейсы</a>
+  <a href="https://t.me/mashakazak" class="btn">Написать</a>
+</nav>
+
+<!-- HERO -->
+<div class="case-hero">
+  <div class="container">
+    <div class="case-eyebrow">ToV-гайдлайн · Сервис доставки</div>
+    <h1>Tone of Voice<br>для сервиса доставки еды</h1>
+    <p class="case-hero-desc">Фрагмент редполитики для вымышленного сервиса доставки «Шустро». Характер бренда, правила тона, разбор ситуаций и стоп-слова — всё что нужно, чтобы любой текст в продукте звучал одинаково.</p>
+    <div class="case-meta">
+      <div class="meta-item">
+        <span class="meta-label">Продукт</span>
+        <span class="meta-val">«Шустро» — сервис доставки еды</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Документ</span>
+        <span class="meta-val">Фрагмент ToV-гайдлайна</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Для кого</span>
+        <span class="meta-val">Редакторы, дизайнеры, поддержка</span>
+      </div>
+    </div>
+    <div class="task-nav">
+      <a href="#context">Контекст</a>
+      <a href="#character">Характер</a>
+      <a href="#rules">Правила</a>
+      <a href="#situations">Ситуации</a>
+      <a href="#stopwords">Стоп-слова</a>
+      <a href="#checklist">Чеклист</a>
+      <a href="#process">Разбор</a>
+    </div>
+  </div>
+</div>
+
+<!-- CONTEXT -->
+<div class="task-section" id="context">
+  <div class="container">
+    <div class="task-eyebrow reveal">О документе</div>
+    <h2 class="reveal">Зачем нужен ToV-гайдлайн</h2>
+
+    <div class="tov-intro reveal">
+      <div class="tov-intro-label">Для всех кто пишет от имени «Шустро»</div>
+      <p>Этот документ — не набор запретов. Это описание того, как «Шустро» говорит с людьми. Пользователь видит сотни наших текстов: пуши, экраны приложения, письма, ответы поддержки. Если каждый из них звучит по-разному — бренда нет.</p>
+      <p>Гайдлайн нужен, чтобы любой человек в команде — редактор, дизайнер, оператор поддержки — мог написать текст, который звучит как «Шустро», а не как «банк» или «госуслуги».</p>
+    </div>
+
+    <p class="reveal">«Шустро» — сервис доставки для людей, которым некогда ждать. Аудитория: 22–40 лет, городские жители, привыкли к скорости и конкретике. Ценят честность и ненавидят маркетинговый воздух.</p>
+  </div>
+</div>
+
+<!-- CHARACTER -->
+<div class="task-section" id="character">
+  <div class="container">
+    <div class="task-eyebrow reveal">Характер бренда</div>
+    <h2 class="reveal">Кто такой «Шустро»</h2>
+    <p class="reveal">Если бы «Шустро» был человеком — это был бы приятель, который знает хорошие рестораны, всегда вовремя и никогда не грузит лишним. Говорит по делу, но с теплотой.</p>
+
+    <div class="character-grid reveal">
+      <div class="character-card">
+        <div class="character-icon">⚡</div>
+        <div class="character-trait">Быстрый и конкретный</div>
+        <div class="character-desc">Не тратит слова впустую. Каждое предложение — про дело. Если можно сказать короче — говорит короче.</div>
+        <div class="character-quote">«Курьер уже едет — будет через 8 минут»<br>а не «Ваш заказ передан курьерской службе и в настоящее время находится в пути»</div>
+      </div>
+      <div class="character-card">
+        <div class="character-icon">🤝</div>
+        <div class="character-trait">Честный и прямой</div>
+        <div class="character-desc">Не скрывает проблем и не прячется за формулировками. Если что-то идёт не так — говорит об этом первым.</div>
+        <div class="character-quote">«Курьер опаздывает на 15 минут — наша вина»<br>а не «Время доставки может варьироваться»</div>
+      </div>
+      <div class="character-card">
+        <div class="character-icon">😌</div>
+        <div class="character-trait">Спокойный в стрессе</div>
+        <div class="character-desc">Не паникует, не оправдывается и не переусердствует с извинениями. В трудной ситуации остаётся уверенным и предлагает решение.</div>
+        <div class="character-quote">«Исправим — вот купон на следующий заказ»<br>а не «Приносим искренние извинения за доставленные неудобства»</div>
+      </div>
+      <div class="character-card">
+        <div class="character-icon">😄</div>
+        <div class="character-trait">Тёплый, но не фамильярный</div>
+        <div class="character-desc">Дружелюбный без панибратства. Иногда может пошутить — но коротко и к месту. Никогда не навязывается.</div>
+        <div class="character-quote">«Ваш бургер уже жарится 🍔»<br>а не «Вау, отличный выбор, дружище!!! 🔥🔥🔥»</div>
+      </div>
+    </div>
+
+    <div class="spectrum reveal">
+      <div class="spectrum-title">Где «Шустро» на шкале тона</div>
+      <div class="spectrum-row">
+        <div class="spectrum-label-left">Официальный</div>
+        <div class="spectrum-track"><div class="spectrum-fill" style="width:70%"></div><div class="spectrum-dot" style="left:65%"></div></div>
+        <div class="spectrum-label-right">Неформальный</div>
+      </div>
+      <div class="spectrum-row">
+        <div class="spectrum-label-left">Серьёзный</div>
+        <div class="spectrum-track"><div class="spectrum-fill" style="width:55%"></div><div class="spectrum-dot" style="left:50%"></div></div>
+        <div class="spectrum-label-right">Игривый</div>
+      </div>
+      <div class="spectrum-row">
+        <div class="spectrum-label-left">Холодный</div>
+        <div class="spectrum-track"><div class="spectrum-fill" style="width:65%"></div><div class="spectrum-dot" style="left:60%"></div></div>
+        <div class="spectrum-label-right">Тёплый</div>
+      </div>
+      <div class="spectrum-row">
+        <div class="spectrum-label-left">Сдержанный</div>
+        <div class="spectrum-track"><div class="spectrum-fill" style="width:60%"></div><div class="spectrum-dot" style="left:55%"></div></div>
+        <div class="spectrum-label-right">Эмоциональный</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RULES -->
+<div class="task-section" id="rules">
+  <div class="container">
+    <div class="task-eyebrow reveal">Правила тона</div>
+    <h2 class="reveal">Как писать от имени «Шустро»</h2>
+
+    <div class="rules-list reveal">
+
+      <div class="rule-item">
+        <div class="rule-header">
+          <div class="rule-num">1</div>
+          <div class="rule-title">Активный залог — всегда</div>
+        </div>
+        <div class="rule-desc">Субъект действия — мы или пользователь, а не абстрактная «система». Пассивный залог скрывает ответственность и делает текст тяжелее.</div>
+        <div class="rule-examples">
+          <div class="rule-ex bad">
+            <div class="rule-ex-label">Не так</div>
+            <div class="rule-ex-text">Заказ был отменён. Средства будут возвращены в течение 3–5 рабочих дней.</div>
+          </div>
+          <div class="rule-ex good">
+            <div class="rule-ex-label">Вот так</div>
+            <div class="rule-ex-text">Мы отменили заказ. Вернём деньги за 3–5 дней.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rule-item">
+        <div class="rule-header">
+          <div class="rule-num">2</div>
+          <div class="rule-title">Одна мысль — одно предложение</div>
+        </div>
+        <div class="rule-desc">Длинные предложения с несколькими придаточными — признак непродуманного текста. Если предложение можно разбить — разбиваем.</div>
+        <div class="rule-examples">
+          <div class="rule-ex bad">
+            <div class="rule-ex-label">Не так</div>
+            <div class="rule-ex-text">Ваш заказ принят и передан в ресторан, который в ближайшее время начнёт его приготовление, после чего курьер заберёт его и доставит по указанному адресу.</div>
+          </div>
+          <div class="rule-ex good">
+            <div class="rule-ex-label">Вот так</div>
+            <div class="rule-ex-text">Заказ принят. Ресторан уже готовит — курьер заберёт и привезёт.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rule-item">
+        <div class="rule-header">
+          <div class="rule-num">3</div>
+          <div class="rule-title">Конкретные цифры вместо размытых обещаний</div>
+        </div>
+        <div class="rule-desc">«Скоро», «в ближайшее время», «несколько минут» — это ничто. Пользователь хочет знать точно. Если знаем — говорим. Если не знаем — честно объясняем почему.</div>
+        <div class="rule-examples">
+          <div class="rule-ex bad">
+            <div class="rule-ex-label">Не так</div>
+            <div class="rule-ex-text">Курьер скоро будет у вас. Ожидайте в ближайшее время.</div>
+          </div>
+          <div class="rule-ex good">
+            <div class="rule-ex-label">Вот так</div>
+            <div class="rule-ex-text">Курьер будет через 12 минут.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rule-item">
+        <div class="rule-header">
+          <div class="rule-num">4</div>
+          <div class="rule-title">Проблема — с решением, не в одиночку</div>
+        </div>
+        <div class="rule-desc">Любое сообщение о проблеме должно содержать следующий шаг или компенсацию. Пользователь не должен оставаться один на один с «что-то пошло не так».</div>
+        <div class="rule-examples">
+          <div class="rule-ex bad">
+            <div class="rule-ex-label">Не так</div>
+            <div class="rule-ex-text">Ресторан не смог выполнить ваш заказ. Приносим извинения за неудобства.</div>
+          </div>
+          <div class="rule-ex good">
+            <div class="rule-ex-label">Вот так</div>
+            <div class="rule-ex-text">Ресторан не смог выполнить заказ — деньги уже возвращаем. Дарим купон 150 ₽ на следующий.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rule-item">
+        <div class="rule-header">
+          <div class="rule-num">5</div>
+          <div class="rule-title">Эмодзи — 0–1 на сообщение, только по делу</div>
+        </div>
+        <div class="rule-desc">Эмодзи уместны в радостных моментах и коротких пушах. В сообщениях об ошибках, отменах и задержках — не используем. Никогда не ставим несколько эмодзи подряд.</div>
+        <div class="rule-examples">
+          <div class="rule-ex bad">
+            <div class="rule-ex-label">Не так</div>
+            <div class="rule-ex-text">Курьер уже едет к вам 🚴🔥⚡ Скоро будет!!! 🎉🎉🎉</div>
+          </div>
+          <div class="rule-ex good">
+            <div class="rule-ex-label">Вот так</div>
+            <div class="rule-ex-text">Курьер едет к вам 🚴 — будет через 10 минут.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rule-item">
+        <div class="rule-header">
+          <div class="rule-num">6</div>
+          <div class="rule-title">«Вы» с большой буквы — нет</div>
+        </div>
+        <div class="rule-desc">Мы не общаемся с пользователями официально. «Вы» с большой буквы — это деловая переписка и банковские письма. «Шустро» говорит «вы» с маленькой — это нормально, дружелюбно и соответствует современным нормам.</div>
+        <div class="rule-examples">
+          <div class="rule-ex bad">
+            <div class="rule-ex-label">Не так</div>
+            <div class="rule-ex-text">Уважаемый клиент! Ваш заказ принят. Мы ценим Ваше доверие.</div>
+          </div>
+          <div class="rule-ex good">
+            <div class="rule-ex-label">Вот так</div>
+            <div class="rule-ex-text">Заказ принят. Уже готовится.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- SITUATIONS -->
+<div class="task-section" id="situations">
+  <div class="container">
+    <div class="task-eyebrow reveal">Ситуации</div>
+    <h2 class="reveal">Как говорить в разных контекстах</h2>
+    <p class="reveal">Тон «Шустро» не одинаковый — он адаптируется к ситуации. Радость звучит немного игривее, стресс — спокойнее и конкретнее.</p>
+
+    <div class="situations reveal">
+
+      <div class="situation">
+        <div class="situation-header">
+          <div class="situation-icon">🎉</div>
+          <div class="situation-name">Заказ принят — радостный момент</div>
+          <div class="situation-mood mood-happy">Тепло + энергия</div>
+        </div>
+        <div class="situation-body">
+          <div class="sit-col bad">
+            <div class="sit-col-label">Не так</div>
+            <div class="sit-text">Уважаемый пользователь, ваш заказ №847261 успешно оформлен и передан в обработку. Ожидаемое время доставки составляет 35–45 минут.</div>
+            <div class="sit-note red">Безжизненно. Номер заказа не нужен пользователю в пуше.</div>
+          </div>
+          <div class="sit-col good">
+            <div class="sit-col-label">Вот так</div>
+            <div class="sit-text">Заказ принят 🍕 Ресторан уже готовит — привезём через 35 минут.</div>
+            <div class="sit-note">Конкретное время, один эмодзи, живо.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="situation">
+        <div class="situation-header">
+          <div class="situation-icon">⏱️</div>
+          <div class="situation-name">Курьер опаздывает</div>
+          <div class="situation-mood mood-stress">Честность + решение</div>
+        </div>
+        <div class="situation-body">
+          <div class="sit-col bad">
+            <div class="sit-col-label">Не так</div>
+            <div class="sit-text">К сожалению, в связи с высокой загруженностью курьерской службы время доставки вашего заказа может быть увеличено. Приносим извинения за возможные неудобства.</div>
+            <div class="sit-note red">Размыто, пассивно, нет конкретики и компенсации.</div>
+          </div>
+          <div class="sit-col good">
+            <div class="sit-col-label">Вот так</div>
+            <div class="sit-text">Курьер опаздывает на 15 минут — наша вина, не ваша. Дарим купон 100 ₽ на следующий заказ. Доставим в 19:45.</div>
+            <div class="sit-note">Признали ответственность. Компенсация. Конкретное время.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="situation">
+        <div class="situation-header">
+          <div class="situation-icon">❌</div>
+          <div class="situation-name">Ресторан отменил заказ</div>
+          <div class="situation-mood mood-stress">Честность + забота</div>
+        </div>
+        <div class="situation-body">
+          <div class="sit-col bad">
+            <div class="sit-col-label">Не так</div>
+            <div class="sit-text">Ваш заказ был отменён по причинам, не зависящим от нашего сервиса. Денежные средства будут возвращены на вашу карту в течение 3–5 рабочих дней.</div>
+            <div class="sit-note red">«По причинам, не зависящим» — это перекладывание ответственности. Нет следующего шага.</div>
+          </div>
+          <div class="sit-col good">
+            <div class="sit-col-label">Вот так</div>
+            <div class="sit-text">Ресторан отменил заказ — нам жаль. Деньги вернём за 3 дня. Хотите заказать из другого места? Подберём похожее.</div>
+            <div class="sit-note">Честно. Есть предложение следующего шага.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="situation">
+        <div class="situation-header">
+          <div class="situation-icon">⭐</div>
+          <div class="situation-name">Просьба оставить отзыв</div>
+          <div class="situation-mood mood-neutral">Ненавязчиво</div>
+        </div>
+        <div class="situation-body">
+          <div class="sit-col bad">
+            <div class="sit-col-label">Не так</div>
+            <div class="sit-text">Пожалуйста, оцените качество нашего сервиса! Ваше мнение очень важно для нас и помогает нам становиться лучше!!!</div>
+            <div class="sit-note red">Три восклицательных знака — это давление. «Очень важно для нас» — клише.</div>
+          </div>
+          <div class="sit-col good">
+            <div class="sit-col-label">Вот так</div>
+            <div class="sit-text">Как вам заказ? Одна звёздочка — и всё, больше ничего не нужно.</div>
+            <div class="sit-note">Снижаем барьер: одна звезда — это легко. Нет давления.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="situation">
+        <div class="situation-header">
+          <div class="situation-icon">🎁</div>
+          <div class="situation-name">Промо и спецпредложения</div>
+          <div class="situation-mood mood-happy">Конкретно, без ажиотажа</div>
+        </div>
+        <div class="situation-body">
+          <div class="sit-col bad">
+            <div class="sit-col-label">Не так</div>
+            <div class="sit-text">НЕВЕРОЯТНАЯ АКЦИЯ!!! Только сегодня скидка 30% на ВСЁ меню!!! Не упустите шанс!!! 🔥🔥🔥</div>
+            <div class="sit-note red">Капс, три восклицательных, три огня — это спам, не бренд.</div>
+          </div>
+          <div class="sit-col good">
+            <div class="sit-col-label">Вот так</div>
+            <div class="sit-text">Сегодня −30% на всё меню «Бургер Хаус». До 23:00 🍔</div>
+            <div class="sit-note">Конкретно: что, где, до когда. Один эмодзи по теме.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- STOP WORDS -->
+<div class="task-section" id="stopwords">
+  <div class="container">
+    <div class="task-eyebrow reveal">Стоп-слова</div>
+    <h2 class="reveal">Что не говорит «Шустро»</h2>
+    <p class="reveal">Эти слова и конструкции делают текст тяжелее, официознее или пустее. Если видите их в тексте — заменяйте.</p>
+
+    <div class="forbidden-grid reveal">
+      <div class="forbidden-item">
+        <div class="forbidden-word">«Уважаемый клиент»</div>
+        <div class="forbidden-why">Официальное обращение создаёт дистанцию. Мы не банк.</div>
+        <div class="forbidden-instead">Просто начните с сути: «Заказ принят», «Курьер едет»</div>
+      </div>
+      <div class="forbidden-item">
+        <div class="forbidden-word">«Осуществить», «произвести»</div>
+        <div class="forbidden-why">Канцелярит. «Осуществить доставку» = «доставить».</div>
+        <div class="forbidden-instead">Используйте простые глаголы: доставить, оплатить, отменить</div>
+      </div>
+      <div class="forbidden-item">
+        <div class="forbidden-word">«Неудобства»</div>
+        <div class="forbidden-why">«Извините за неудобства» — пустая формула. Называйте проблему своими именами.</div>
+        <div class="forbidden-instead">«Курьер опоздал — нам жаль» вместо «за возможные неудобства»</div>
+      </div>
+      <div class="forbidden-item">
+        <div class="forbidden-word">«В ближайшее время»</div>
+        <div class="forbidden-why">Размыто. Пользователь не знает сколько ждать.</div>
+        <div class="forbidden-instead">Конкретное время: «через 15 минут», «до конца дня»</div>
+      </div>
+      <div class="forbidden-item">
+        <div class="forbidden-word">«Ваше мнение очень важно»</div>
+        <div class="forbidden-why">Клише, которое никто не читает. Звучит неискренне.</div>
+        <div class="forbidden-instead">«Как вам заказ?» — честно и коротко</div>
+      </div>
+      <div class="forbidden-item">
+        <div class="forbidden-word">«Является»</div>
+        <div class="forbidden-why">«Сервис является лидером рынка» = «Мы лидеры рынка». Всегда можно переписать.</div>
+        <div class="forbidden-instead">Переформулируйте через прямое утверждение</div>
+      </div>
+      <div class="forbidden-item">
+        <div class="forbidden-word">«Не зависящим от нас»</div>
+        <div class="forbidden-why">Перекладывание ответственности. Пользователю всё равно — он заплатил нам.</div>
+        <div class="forbidden-instead">Берите ответственность: «Ресторан отменил — мы исправляем»</div>
+      </div>
+      <div class="forbidden-item">
+        <div class="forbidden-word">«!!!» и капс</div>
+        <div class="forbidden-why">Выглядит как спам. Три восклицательных = крик. Капс = агрессия.</div>
+        <div class="forbidden-instead">Один восклицательный знак — максимум. Капс не используем никогда.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHECKLIST -->
+<div class="task-section" id="checklist">
+  <div class="container">
+    <div class="task-eyebrow reveal">Чеклист</div>
+    <h2 class="reveal">Проверка текста перед публикацией</h2>
+    <p class="reveal">Прежде чем отдать текст в разработку или поддержку — пройдите по этому списку.</p>
+
+    <div class="checklist reveal">
+      <div class="checklist-title">Проверьте каждый текст</div>
+      <div class="checklist-items">
+        <div class="checklist-item"><div class="checklist-box"></div>Нет пассивного залога («было отменено» → «мы отменили»)</div>
+        <div class="checklist-item"><div class="checklist-box"></div>Нет размытых временных обещаний («скоро», «в ближайшее время»)</div>
+        <div class="checklist-item"><div class="checklist-box"></div>Нет стоп-слов из списка выше</div>
+        <div class="checklist-item"><div class="checklist-box"></div>Если есть проблема — есть следующий шаг или компенсация</div>
+        <div class="checklist-item"><div class="checklist-box"></div>Эмодзи не больше одного, и только в подходящем контексте</div>
+        <div class="checklist-item"><div class="checklist-box"></div>Нет «Уважаемый», «Ваш» (с большой) и «Вы» (с большой)</div>
+        <div class="checklist-item"><div class="checklist-box"></div>Текст понятен без знания продукта изнутри</div>
+        <div class="checklist-item"><div class="checklist-box"></div>Если убрать половину слов — смысл не потеряется? Если да — сокращайте</div>
+        <div class="checklist-item"><div class="checklist-box"></div>Прочитайте вслух: звучит как человек или как инструкция?</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROCESS -->
+<div class="process-section" id="process">
+  <div class="container">
+    <div class="task-eyebrow reveal">Разбор</div>
+    <h2 class="reveal">Как я думала над гайдлайном</h2>
+    <div class="process-items reveal">
+      <div class="process-item">
+        <div class="process-item-label">Сначала — характер, потом — правила</div>
+        <div class="process-item-body">
+          Правила без понимания характера бренда — это список ограничений. Правила, которые вытекают из характера — это логика. <strong>Если понимаешь кто такой «Шустро», правило «не пиши "в ближайшее время"» не нужно объяснять</strong> — оно очевидно, потому что «Шустро» конкретный.
+        </div>
+      </div>
+      <div class="process-item">
+        <div class="process-item-label">Каждое правило — с примером</div>
+        <div class="process-item-body">
+          Абстрактные правила не работают. «Пишите живо» — непонятно. «Вот так — плохо, вот так — хорошо» — понятно сразу. <strong>Редактор, дизайнер или оператор поддержки должен применить правило без переспросов.</strong> Если пример нужно объяснять — правило сформулировано неправильно.
+        </div>
+      </div>
+      <div class="process-item">
+        <div class="process-item-label">Ситуации важнее абстрактных правил</div>
+        <div class="process-item-body">
+          Тон — не одинаковый. Пуш «заказ принят» и пуш «курьер опаздывает» должны звучать по-разному, хотя оба от «Шустро». <strong>Раздел с ситуациями — самая практичная часть гайдлайна:</strong> человек открывает, находит свой случай и видит конкретный пример.
+        </div>
+      </div>
+      <div class="process-item">
+        <div class="process-item-label">Чеклист — для всех, не только для редакторов</div>
+        <div class="process-item-body">
+          ToV-гайдлайн должен работать не только когда редактор пишет текст с нуля. <strong>Дизайнер, который правит кнопку, или оператор, который отвечает в чате — тоже пишут от имени бренда.</strong> Чеклист — это инструмент для всех, кто касается текста.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="case-cta">
+  <div class="container">
+    <p>Понравился кейс? Посмотрите другие работы или напишите мне</p>
+    <div class="cta-btns">
+      <a href="index.html#cases" class="cta-btn-secondary">Все кейсы</a>
+      <a href="https://t.me/mashakazak" class="cta-btn-primary">Написать в Telegram</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-name">Маша Казак</div>
+      <div class="footer-sub">UX-редактор · Москва</div>
+    </div>
+    <div class="footer-contacts">
+      <a href="mailto:Cassaque@gmail.com" class="footer-contact">Cassaque@gmail.com</a>
+      <a href="https://t.me/mashakazak" class="footer-contact">@mashakazak</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 10));
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+  }, { threshold: 0.07 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
