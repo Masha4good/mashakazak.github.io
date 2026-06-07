@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UX-аудит онбординга «Халвы» | Маша Казак</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-secondary: #f7f7f5;
+    --ink: #1a1a1a;
+    --ink-soft: #555;
+    --ink-muted: #999;
+    --accent: #2563eb;
+    --accent-bg: #eff6ff;
+    --line: #e8e8e4;
+    --radius: 12px;
+    --sans: 'Inter', -apple-system, sans-serif;
+    --halva: #8B2FC9;
+    --halva-light: #f5eeff;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 48px; height: 60px; background: rgba(255,255,255,0.92); backdrop-filter: blur(16px); border-bottom: 1px solid transparent; transition: border-color .2s; }
+  nav.scrolled { border-bottom-color: var(--line); }
+  .nav-logo { font-size: 15px; font-weight: 600; color: var(--ink); text-decoration: none; }
+  .nav-back { font-size: 13px; font-weight: 500; color: var(--ink-soft); text-decoration: none; transition: color .15s; }
+  .nav-back:hover { color: var(--ink); }
+  .btn { background: var(--ink); color: #fff !important; padding: 7px 16px; border-radius: 6px; font-size: 13px; font-weight: 500; text-decoration: none; transition: opacity .15s; }
+  .btn:hover { opacity: .8; }
+
+  .container { max-width: 780px; margin: 0 auto; padding: 0 48px; }
+  .container-wide { max-width: 1080px; margin: 0 auto; padding: 0 48px; }
+
+  .case-hero { padding: 120px 0 64px; border-bottom: 1px solid var(--line); }
+  .case-eyebrow { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 20px; opacity: 0; animation: fadeUp .5s ease forwards .1s; }
+  .case-hero h1 { font-size: clamp(32px,4.5vw,52px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 20px; opacity: 0; animation: fadeUp .5s ease forwards .2s; }
+  .case-hero-desc { font-size: 17px; line-height: 1.75; color: var(--ink-soft); margin-bottom: 40px; max-width: 600px; opacity: 0; animation: fadeUp .5s ease forwards .3s; }
+  .case-meta { display: flex; gap: 32px; flex-wrap: wrap; opacity: 0; animation: fadeUp .5s ease forwards .4s; }
+  .meta-item { display: flex; flex-direction: column; gap: 4px; }
+  .meta-label { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-muted); }
+  .meta-val { font-size: 14px; font-weight: 600; }
+
+  .task-nav { display: flex; gap: 8px; padding: 32px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .task-nav a { font-size: 13px; font-weight: 500; color: var(--ink-soft); text-decoration: none; padding: 6px 14px; border-radius: 6px; background: var(--bg-secondary); border: 1px solid var(--line); transition: all .15s; }
+  .task-nav a:hover { border-color: #ccc; color: var(--ink); }
+
+  .task-section { padding: 72px 0; border-bottom: 1px solid var(--line); }
+  .task-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 16px; }
+  .task-section h2 { font-size: clamp(24px,3vw,34px); font-weight: 700; letter-spacing: -0.025em; line-height: 1.2; margin-bottom: 20px; }
+  .task-section p { font-size: 15px; line-height: 1.75; color: var(--ink-soft); margin-bottom: 16px; }
+  .task-section p:last-child { margin-bottom: 0; }
+
+  .thinking { background: var(--bg-secondary); border-left: 3px solid var(--accent); border-radius: 0 var(--radius) var(--radius) 0; padding: 24px 28px; margin: 32px 0; }
+  .thinking-title { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
+  .thinking p { font-size: 14px; line-height: 1.75; color: var(--ink-soft); margin-bottom: 10px; }
+  .thinking p:last-child { margin-bottom: 0; }
+
+  /* PERSONA */
+  .persona-card { background: var(--bg-secondary); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px 32px; margin: 32px 0; display: grid; grid-template-columns: 64px 1fr; gap: 24px; align-items: start; }
+  .persona-avatar { width: 64px; height: 64px; border-radius: 50%; background: var(--halva-light); display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 700; color: var(--halva); }
+  .persona-name { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .persona-role { font-size: 12px; color: var(--halva); font-weight: 500; margin-bottom: 12px; }
+  .persona-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .persona-tag { font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 6px; background: var(--bg); border: 1px solid var(--line); color: var(--ink-soft); }
+  .persona-desc { font-size: 13px; line-height: 1.7; color: var(--ink-soft); }
+
+  /* AUDIT ITEMS */
+  .audit-items { display: flex; flex-direction: column; gap: 0; }
+  .audit-item { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; margin-bottom: 20px; }
+
+  .audit-header { padding: 18px 24px; background: var(--bg-secondary); border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; }
+  .audit-screen-name { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 4px; }
+  .audit-title { font-size: 16px; font-weight: 700; }
+  .audit-severity { font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 20px; white-space: nowrap; }
+  .sev-high { background: #fff5f5; color: #dc2626; border: 1px solid #fecaca; }
+  .sev-mid { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
+  .sev-low { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
+
+  .audit-body { display: grid; grid-template-columns: 1fr 1fr; }
+  .audit-col { padding: 20px 24px; }
+  .audit-col:first-child { border-right: 1px solid var(--line); }
+  .audit-col-label { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 12px; }
+  .audit-col.problem .audit-col-label { color: #dc2626; }
+  .audit-col.solution .audit-col-label { color: #166534; }
+
+  /* PHONE MOCKUP in audit */
+  .audit-phone { background: #1a1a1a; border-radius: 20px; padding: 10px; margin-bottom: 12px; }
+  .audit-screen { background: #fff; border-radius: 12px; padding: 14px; min-height: 220px; display: flex; flex-direction: column; gap: 8px; }
+  .audit-screen.dark { background: #0f0f0f; }
+
+  .as-progress { height: 3px; background: #eee; border-radius: 2px; margin-bottom: 8px; }
+  .as-progress-fill { height: 100%; background: var(--halva); border-radius: 2px; }
+  .as-title { font-size: 14px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.25; }
+  .as-sub { font-size: 11px; color: var(--ink-soft); line-height: 1.5; }
+  .as-field { background: #f5f5f3; border-radius: 7px; padding: 8px 10px; }
+  .as-field-label { font-size: 9px; font-weight: 700; color: var(--ink-muted); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 2px; }
+  .as-field-val { font-size: 12px; color: var(--ink); }
+  .as-field-placeholder { font-size: 12px; color: #ccc; }
+  .as-btn { border-radius: 8px; padding: 10px; text-align: center; font-size: 12px; font-weight: 700; margin-top: auto; }
+  .as-btn.primary { background: var(--halva); color: #fff; }
+  .as-btn.gray { background: #e0e0e0; color: #999; }
+  .as-hint { font-size: 10px; color: var(--ink-muted); line-height: 1.4; }
+  .as-legal { font-size: 9px; color: #bbb; line-height: 1.5; }
+  .as-legal a { color: var(--halva); }
+
+  /* splash screen */
+  .as-splash { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; min-height: 200px; background: var(--halva); border-radius: 12px; gap: 10px; }
+  .as-splash-logo { font-size: 22px; font-weight: 700; color: #fff; }
+  .as-splash-tag { font-size: 11px; color: rgba(255,255,255,.6); }
+  .as-splash-title { font-size: 16px; font-weight: 700; color: #fff; line-height: 1.25; }
+  .as-splash-sub { font-size: 11px; color: rgba(255,255,255,.65); line-height: 1.5; }
+  .as-splash-btn { background: #fff; color: var(--halva); border-radius: 8px; padding: 10px 20px; font-size: 12px; font-weight: 700; margin-top: 8px; }
+  .as-splash-btn2 { color: rgba(255,255,255,.7); font-size: 11px; }
+
+  /* annotation */
+  .audit-annotation { font-size: 13px; line-height: 1.65; color: var(--ink-soft); }
+  .audit-annotation strong { color: var(--ink); }
+  .audit-note { font-size: 12px; color: var(--accent); font-weight: 500; margin-top: 10px; }
+  .audit-note.red { color: #dc2626; }
+
+  /* SUMMARY */
+  .summary-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin: 32px 0; }
+  .summary-card { background: var(--bg-secondary); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; text-align: center; }
+  .summary-num { font-size: 36px; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 4px; }
+  .summary-num.red { color: #dc2626; }
+  .summary-num.orange { color: #ea580c; }
+  .summary-num.yellow { color: #ca8a04; }
+  .summary-label { font-size: 12px; color: var(--ink-soft); }
+
+  /* PROCESS */
+  .process-section { padding: 72px 0; }
+  .process-section h2 { font-size: clamp(24px,3vw,34px); font-weight: 700; letter-spacing: -0.025em; line-height: 1.2; margin-bottom: 40px; }
+  .process-items { display: flex; flex-direction: column; }
+  .process-item { display: grid; grid-template-columns: 200px 1fr; gap: 32px; padding: 32px 0; border-bottom: 1px solid var(--line); }
+  .process-item:last-child { border-bottom: none; }
+  .process-item-label { font-size: 14px; font-weight: 600; padding-top: 2px; }
+  .process-item-body { font-size: 14px; line-height: 1.75; color: var(--ink-soft); }
+  .process-item-body strong { color: var(--ink); font-weight: 600; }
+
+  .case-cta { padding: 64px 0; text-align: center; }
+  .case-cta p { font-size: 16px; color: var(--ink-soft); margin-bottom: 24px; }
+  .cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .cta-btn-primary { background: var(--ink); color: #fff; padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none; transition: opacity .15s; }
+  .cta-btn-primary:hover { opacity: .85; }
+  .cta-btn-secondary { background: var(--bg-secondary); border: 1px solid var(--line); color: var(--ink); padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none; transition: border-color .15s; }
+  .cta-btn-secondary:hover { border-color: #ccc; }
+
+  footer { padding: 48px 0; border-top: 1px solid var(--line); }
+  .footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; max-width: 1080px; margin: 0 auto; padding: 0 48px; }
+  .footer-name { font-size: 16px; font-weight: 700; }
+  .footer-sub { font-size: 13px; color: var(--ink-muted); }
+  .footer-contacts { display: flex; gap: 20px; }
+  .footer-contact { font-size: 13px; font-weight: 500; color: var(--ink-soft); text-decoration: none; transition: color .15s; }
+  .footer-contact:hover { color: var(--ink); }
+
+  @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+  .reveal { opacity:0; transform:translateY(14px); transition: opacity .5s ease, transform .5s ease; }
+  .reveal.visible { opacity:1; transform:translateY(0); }
+
+  @media (max-width: 900px) {
+    nav { padding: 0 24px; }
+    .container, .container-wide { padding: 0 24px; }
+    .persona-card { grid-template-columns: 1fr; }
+    .audit-body { grid-template-columns: 1fr; }
+    .audit-col:first-child { border-right: none; border-bottom: 1px solid var(--line); }
+    .summary-row { grid-template-columns: 1fr; }
+    .process-item { grid-template-columns: 1fr; gap: 12px; }
+    footer .footer-inner { padding: 0 24px; flex-direction: column; align-items: flex-start; }
+    .case-hero { padding: 100px 0 48px; }
+    .audit-header { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <a href="index.html" class="nav-logo">Маша Казак</a>
+  <a href="index.html#cases" class="nav-back">← Все кейсы</a>
+  <a href="https://t.me/mashakazak" class="btn">Написать</a>
+</nav>
+
+<!-- HERO -->
+<div class="case-hero">
+  <div class="container">
+    <div class="case-eyebrow">UX-аудит · Реальное приложение</div>
+    <h1>Аудит онбординга<br>«Халва — Совкомбанк»</h1>
+    <p class="case-hero-desc">UX-аудит экранов первого запуска приложения карты рассрочки «Халва». Разобрала флоу через персону, нашла 6 текстовых проблем и предложила исправления для каждой.</p>
+    <div class="case-meta">
+      <div class="meta-item">
+        <span class="meta-label">Продукт</span>
+        <span class="meta-val">Халва — Совкомбанк</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Сценарий</span>
+        <span class="meta-val">Онбординг после установки</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Метод</span>
+        <span class="meta-val">UX-аудит текстов</span>
+      </div>
+    </div>
+    <div class="task-nav">
+      <a href="#context">Контекст</a>
+      <a href="#persona">Персона</a>
+      <a href="#audit">Аудит</a>
+      <a href="#summary">Итог</a>
+      <a href="#process">Разбор</a>
+    </div>
+  </div>
+</div>
+
+<!-- CONTEXT -->
+<div class="task-section" id="context">
+  <div class="container">
+    <div class="task-eyebrow reveal">Контекст</div>
+    <h2 class="reveal">Что такое «Халва» и зачем аудит</h2>
+    <p class="reveal">«Халва» — карта рассрочки Совкомбанка с 9+ млн установок. Продукт сложный: рассрочка отличается от кредита, у неё свои правила, партнёры и ограничения. Новый пользователь приходит в приложение с низким уровнем понимания продукта и высокой тревогой — «не попаду ли я в долговую яму?».</p>
+
+    <div class="thinking reveal">
+      <div class="thinking-title">Гипотеза перед аудитом</div>
+      <p>Онбординг финансового приложения с нестандартным продуктом должен решать три задачи одновременно: объяснить что такое рассрочка и чем она отличается от кредита, снять тревогу («это безопасно»), и провести пользователя к первому полезному действию — активации карты.</p>
+      <p>Предполагаю, что приложение сосредоточено на регистрации, но не объясняет продукт на входе. Проверяю.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PERSONA -->
+<div class="task-section" id="persona">
+  <div class="container">
+    <div class="task-eyebrow reveal">Персона</div>
+    <h2 class="reveal">Кто приходит в онбординг «Халвы»</h2>
+
+    <div class="persona-card reveal">
+      <div class="persona-avatar">НС</div>
+      <div>
+        <div class="persona-name">Наташа, 34 года</div>
+        <div class="persona-role">Целевой пользователь «Халвы»</div>
+        <div class="persona-tags">
+          <span class="persona-tag">Покупает в рассрочку впервые</span>
+          <span class="persona-tag">Смотрела рекламу по ТВ</span>
+          <span class="persona-tag">Боится кредитов</span>
+          <span class="persona-tag">Пользуется мобильным банком</span>
+        </div>
+        <div class="persona-desc">Видела рекламу «Халвы» — «покупай сейчас, плати потом без процентов». Звучит хорошо, но непонятно: это кредитная карта? Как это работает? Не будет ли скрытых платежей? Скачала приложение, чтобы разобраться. Пользуется Сбером и знает как выглядит нормальный мобильный банк.</div>
+      </div>
+    </div>
+
+    <div class="thinking reveal">
+      <div class="thinking-title">Главный вопрос персоны на входе</div>
+      <p>«Это вообще безопасно? Мне не придётся платить проценты?» — Наташа пришла за конкретным ответом. Если онбординг не даёт его в первые 30 секунд, она закроет приложение. Реклама пообещала «без процентов» — приложение должно это подтвердить и объяснить механику.</p>
+    </div>
+  </div>
+</div>
+
+<!-- AUDIT -->
+<div class="task-section" id="audit">
+  <div class="container">
+    <div class="task-eyebrow reveal">Аудит экранов</div>
+    <h2 class="reveal">Что нашла и как исправить</h2>
+    <p class="reveal">Прошла онбординг глазами Наташи. Нашла шесть текстовых проблем — от критических до мелких.</p>
+  </div>
+
+  <div class="container-wide">
+    <div class="audit-items reveal">
+
+      <!-- 1 -->
+      <div class="audit-item">
+        <div class="audit-header">
+          <div>
+            <div class="audit-screen-name">Экран 1 · Сплэш / приветствие</div>
+            <div class="audit-title">Слоган вместо объяснения продукта</div>
+          </div>
+          <div class="audit-severity sev-high">Критично</div>
+        </div>
+        <div class="audit-body">
+          <div class="audit-col problem">
+            <div class="audit-col-label">Проблема</div>
+            <div class="audit-phone">
+              <div class="as-splash">
+                <div class="as-splash-logo">Халва</div>
+                <div class="as-splash-tag">Совкомбанк</div>
+                <div style="height:1px; background:rgba(255,255,255,.15); width:100%; margin: 4px 0;"></div>
+                <div class="as-splash-title">Банковский офис<br>на экране смартфона</div>
+                <div class="as-splash-sub">Управляй финансами<br>легко и удобно</div>
+                <div class="as-splash-btn">Войти</div>
+                <div class="as-splash-btn2">Оформить карту</div>
+              </div>
+            </div>
+            <div class="audit-annotation">
+              <strong>«Банковский офис на экране»</strong> — это описание любого мобильного банка. Наташа, которая пришла разобраться что такое рассрочка, не получает ответа на главный вопрос. Слоган «управляй финансами легко и удобно» — абстракция без конкретики.
+            </div>
+            <div class="audit-note red">Пользователь не понимает чем «Халва» отличается от обычной карты</div>
+          </div>
+          <div class="audit-col solution">
+            <div class="audit-col-label">Предложение</div>
+            <div class="audit-phone">
+              <div class="as-splash">
+                <div class="as-splash-logo">Халва</div>
+                <div class="as-splash-tag">Совкомбанк</div>
+                <div style="height:1px; background:rgba(255,255,255,.15); width:100%; margin: 4px 0;"></div>
+                <div class="as-splash-title">Покупай сейчас —<br>плати частями без процентов</div>
+                <div class="as-splash-sub">Рассрочка до 24 месяцев<br>в 260 000+ магазинах</div>
+                <div class="as-splash-btn">Войти</div>
+                <div class="as-splash-btn2">Оформить карту — бесплатно</div>
+              </div>
+            </div>
+            <div class="audit-annotation">
+              Главный экран повторяет ключевое обещание рекламы — «без процентов» — и сразу даёт масштаб: 260 000 магазинов. Слово «бесплатно» рядом с «Оформить» снимает барьер.
+            </div>
+            <div class="audit-note">Пользователь видит продукт, а не банковский интерфейс</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2 -->
+      <div class="audit-item">
+        <div class="audit-header">
+          <div>
+            <div class="audit-screen-name">Экран 2 · Ввод телефона</div>
+            <div class="audit-title">Нет объяснения зачем нужен телефон</div>
+          </div>
+          <div class="audit-severity sev-mid">Средне</div>
+        </div>
+        <div class="audit-body">
+          <div class="audit-col problem">
+            <div class="audit-col-label">Проблема</div>
+            <div class="audit-phone">
+              <div class="audit-screen">
+                <div class="as-progress"><div class="as-progress-fill" style="width:25%"></div></div>
+                <div class="as-title">Введите номер телефона</div>
+                <div style="height:8px;"></div>
+                <div class="as-field">
+                  <div class="as-field-placeholder">+7 (___) ___-__-__</div>
+                </div>
+                <div style="height:8px;"></div>
+                <div class="as-legal">Нажимая «Продолжить», я принимаю <a>условия использования</a> и <a>политику конфиденциальности</a> и даю согласие на <a>обработку персональных данных</a></div>
+                <div class="as-btn gray" style="margin-top:10px;">Продолжить</div>
+              </div>
+            </div>
+            <div class="audit-annotation">
+              Экран начинается сразу с поля ввода — без объяснения зачем номер нужен. Три ссылки в юридическом тексте создают ощущение ловушки. Кнопка серая даже до ввода — нет ощущения действия.
+            </div>
+            <div class="audit-note red">Юридический текст пугает новичка раньше, чем он успел понять продукт</div>
+          </div>
+          <div class="audit-col solution">
+            <div class="audit-col-label">Предложение</div>
+            <div class="audit-phone">
+              <div class="audit-screen">
+                <div class="as-progress"><div class="as-progress-fill" style="width:25%"></div></div>
+                <div class="as-title">Ваш номер телефона</div>
+                <div class="as-sub">Отправим код для входа. Никаких звонков — только SMS.</div>
+                <div class="as-field" style="margin-top:8px;">
+                  <div class="as-field-placeholder">+7 (___) ___-__-__</div>
+                </div>
+                <div class="as-hint" style="margin-top:6px;">Номер нужен для входа и уведомлений об операциях</div>
+                <div style="margin-top:auto;">
+                  <div class="as-legal">Продолжая, вы соглашаетесь с <a>условиями</a> и <a>политикой</a></div>
+                  <div class="as-btn primary" style="margin-top:8px;">Продолжить</div>
+                </div>
+              </div>
+            </div>
+            <div class="audit-annotation">
+              Подзаголовок снимает страх нежелательных звонков. Хинт объясняет зачем нужен номер. Юридический текст сокращён до двух ссылок — достаточно с точки зрения закона и читабельно.
+            </div>
+            <div class="audit-note">Страх закрыт до того, как возник</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3 -->
+      <div class="audit-item">
+        <div class="audit-header">
+          <div>
+            <div class="audit-screen-name">Экран 3 · Код из SMS</div>
+            <div class="audit-title">Нет информации о времени действия кода</div>
+          </div>
+          <div class="audit-severity sev-low">Мелко</div>
+        </div>
+        <div class="audit-body">
+          <div class="audit-col problem">
+            <div class="audit-col-label">Проблема</div>
+            <div class="audit-phone">
+              <div class="audit-screen">
+                <div class="as-progress"><div class="as-progress-fill" style="width:50%"></div></div>
+                <div class="as-title">Код из SMS</div>
+                <div class="as-sub">Введите код из сообщения</div>
+                <div style="display:flex; gap:8px; justify-content:center; margin:12px 0;">
+                  <div style="width:38px; height:44px; background:#f5f5f3; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700;">·</div>
+                  <div style="width:38px; height:44px; background:#f5f5f3; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700;">·</div>
+                  <div style="width:38px; height:44px; background:#f5f5f3; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700;">·</div>
+                  <div style="width:38px; height:44px; background:#f5f5f3; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700;">·</div>
+                </div>
+                <div class="as-hint" style="text-align:center;">Отправить код повторно</div>
+              </div>
+            </div>
+            <div class="audit-annotation">
+              «Введите код из сообщения» — инструкция ни о чём, пользователь и так понимает. Нет информации сколько времени действует код и через сколько можно запросить повторный. «Отправить код повторно» активно сразу — нет таймера.
+            </div>
+            <div class="audit-note red">Пользователь не знает сколько ждать и что делать если код не пришёл</div>
+          </div>
+          <div class="audit-col solution">
+            <div class="audit-col-label">Предложение</div>
+            <div class="audit-phone">
+              <div class="audit-screen">
+                <div class="as-progress"><div class="as-progress-fill" style="width:50%"></div></div>
+                <div class="as-title">Код из SMS</div>
+                <div class="as-sub">Отправили на +7 ···· ··55. Код действует 10 минут.</div>
+                <div style="display:flex; gap:8px; justify-content:center; margin:12px 0;">
+                  <div style="width:38px; height:44px; background:var(--halva-light); border:1.5px solid var(--halva); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700; color:var(--halva);">·</div>
+                  <div style="width:38px; height:44px; background:#f5f5f3; border-radius:8px;"></div>
+                  <div style="width:38px; height:44px; background:#f5f5f3; border-radius:8px;"></div>
+                  <div style="width:38px; height:44px; background:#f5f5f3; border-radius:8px;"></div>
+                </div>
+                <div class="as-hint" style="text-align:center;"><span style="color:var(--halva); font-weight:500;">Отправить снова</span> через 45 с</div>
+                <div class="as-hint" style="text-align:center; margin-top:4px;">Неверный номер? <span style="color:var(--halva); font-weight:500;">Изменить</span></div>
+              </div>
+            </div>
+            <div class="audit-annotation">
+              Подзаголовок показывает маскированный номер и срок действия. Таймер объясняет почему повторный запрос недоступен сразу. Ссылка «Изменить» даёт выход если номер введён с ошибкой.
+            </div>
+            <div class="audit-note">Все вопросы пользователя закрыты на экране</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4 -->
+      <div class="audit-item">
+        <div class="audit-header">
+          <div>
+            <div class="audit-screen-name">Экран 4 · Создание пин-кода</div>
+            <div class="audit-title">Поучительный тон вместо уважительного</div>
+          </div>
+          <div class="audit-severity sev-mid">Средне</div>
+        </div>
+        <div class="audit-body">
+          <div class="audit-col problem">
+            <div class="audit-col-label">Проблема</div>
+            <div class="audit-phone">
+              <div class="audit-screen">
+                <div class="as-progress"><div class="as-progress-fill" style="width:75%"></div></div>
+                <div class="as-title">Создайте пин-код</div>
+                <div class="as-sub">Придумайте надёжный пин-код для защиты вашего аккаунта. Не используйте простые комбинации цифр.</div>
+                <div style="display:flex; gap:12px; justify-content:center; margin:16px 0;">
+                  <div style="width:12px; height:12px; border-radius:50%; background:#e0e0e0;"></div>
+                  <div style="width:12px; height:12px; border-radius:50%; background:#e0e0e0;"></div>
+                  <div style="width:12px; height:12px; border-radius:50%; background:#e0e0e0;"></div>
+                  <div style="width:12px; height:12px; border-radius:50%; background:#e0e0e0;"></div>
+                </div>
+                <div class="as-hint" style="text-align:center;">Пин-код должен содержать 4 цифры и не должен совпадать с датой рождения</div>
+              </div>
+            </div>
+            <div class="audit-annotation">
+              «Придумайте надёжный пин-код для защиты вашего аккаунта» — менторский тон. «Не используйте простые комбинации» + «не должен совпадать с датой рождения» — два запрета подряд, это давление. Пользователь чувствует себя школьником.
+            </div>
+            <div class="audit-note red">Поучительный тон создаёт дистанцию и тревогу</div>
+          </div>
+          <div class="audit-col solution">
+            <div class="audit-col-label">Предложение</div>
+            <div class="audit-phone">
+              <div class="audit-screen">
+                <div class="as-progress"><div class="as-progress-fill" style="width:75%"></div></div>
+                <div class="as-title">Придумайте пин-код</div>
+                <div class="as-sub">Его будете знать только вы — даже мы не видим.</div>
+                <div style="display:flex; gap:12px; justify-content:center; margin:16px 0;">
+                  <div style="width:12px; height:12px; border-radius:50%; background:#e0e0e0;"></div>
+                  <div style="width:12px; height:12px; border-radius:50%; background:#e0e0e0;"></div>
+                  <div style="width:12px; height:12px; border-radius:50%; background:#e0e0e0;"></div>
+                  <div style="width:12px; height:12px; border-radius:50%; background:#e0e0e0;"></div>
+                </div>
+                <div class="as-hint" style="text-align:center;">4 цифры. Избегайте даты рождения — её легко угадать.</div>
+              </div>
+            </div>
+            <div class="audit-annotation">
+              «Его будете знать только вы» — акцент на приватности как ценности, а не на запрете. Запрет про дату рождения превратился в объяснение почему — это звучит как совет, а не приказ.
+            </div>
+            <div class="audit-note">Контроль остаётся у пользователя</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5 -->
+      <div class="audit-item">
+        <div class="audit-header">
+          <div>
+            <div class="audit-screen-name">Экран 5 · Карта активирована</div>
+            <div class="audit-title">Успех без следующего шага</div>
+          </div>
+          <div class="audit-severity sev-high">Критично</div>
+        </div>
+        <div class="audit-body">
+          <div class="audit-col problem">
+            <div class="audit-col-label">Проблема</div>
+            <div class="audit-phone">
+              <div class="audit-screen" style="align-items:center; justify-content:center; text-align:center; gap:12px;">
+                <div style="font-size:36px;">✅</div>
+                <div class="as-title">Вы в системе!</div>
+                <div class="as-sub">Добро пожаловать в Халву. Теперь вы можете пользоваться всеми возможностями приложения.</div>
+                <div class="as-btn primary" style="width:100%; margin-top:16px;">Перейти в приложение</div>
+              </div>
+            </div>
+            <div class="audit-annotation">
+              «Вы в системе!» — техническая фраза из IT-жаргона. «Добро пожаловать в Халву» — формульное приветствие. «Все возможности приложения» — абстракция без конкретики. Нет ответа на главный вопрос Наташи: «Как мне теперь сделать первую покупку в рассрочку?»
+            </div>
+            <div class="audit-note red">Онбординг заканчивается там, где должен начинаться</div>
+          </div>
+          <div class="audit-col solution">
+            <div class="audit-col-label">Предложение</div>
+            <div class="audit-phone">
+              <div class="audit-screen" style="align-items:center; justify-content:center; text-align:center; gap:10px; padding:14px;">
+                <div style="width:52px; height:52px; background:var(--halva-light); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:22px;">🎉</div>
+                <div class="as-title">Карта активирована!</div>
+                <div class="as-sub">Можете уже сейчас искать магазины и делать первую покупку в рассрочку.</div>
+                <div style="background:var(--bg-secondary); border:1px solid var(--line); border-radius:8px; padding:10px 14px; width:100%; text-align:left;">
+                  <div style="font-size:10px; font-weight:700; color:var(--ink-muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:3px;">Карта рассрочки</div>
+                  <div style="font-size:13px; font-weight:700; letter-spacing:.06em;">•••• •••• •••• 4821</div>
+                </div>
+                <div class="as-btn primary" style="width:100%; margin-top:8px; background:var(--halva);">Найти магазины</div>
+                <div style="font-size:11px; color:var(--ink-muted);">Или изучить карту в приложении</div>
+              </div>
+            </div>
+            <div class="audit-annotation">
+              «Карта активирована» — конкретный результат. CTA «Найти магазины» ведёт к первой ценности продукта, а не к абстрактному «приложению». Виртуальная карта на экране — ощутимый результат регистрации.
+            </div>
+            <div class="audit-note">Пользователь понимает что делать дальше</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6 -->
+      <div class="audit-item">
+        <div class="audit-header">
+          <div>
+            <div class="audit-screen-name">Общий флоу</div>
+            <div class="audit-title">Продукт не объяснён нигде в онбординге</div>
+          </div>
+          <div class="audit-severity sev-high">Критично</div>
+        </div>
+        <div class="audit-body">
+          <div class="audit-col problem">
+            <div class="audit-col-label">Проблема</div>
+            <div class="audit-annotation" style="padding:0;">
+              На всём пути от первого экрана до активации карты нет ни одного экрана или текста, который объяснял бы:
+              <br><br>
+              — что такое рассрочка и чем она отличается от кредита<br>
+              — почему «без процентов» — это правда, а не маркетинг<br>
+              — что нужно делать чтобы платить без переплат<br>
+              — сколько магазинов партнёров и как их найти
+              <br><br>
+              Наташа, которая пришла с вопросом «это безопасно?», уходит из онбординга с тем же вопросом.
+            </div>
+            <div class="audit-note red">Онбординг решает задачу банка (зарегистрировать), но не задачу пользователя (понять продукт)</div>
+          </div>
+          <div class="audit-col solution">
+            <div class="audit-col-label">Предложение</div>
+            <div class="audit-annotation" style="padding:0;">
+              Добавить между подтверждением номера и созданием пин-кода один экран — «Как работает Халва» с тремя пунктами:
+              <br><br>
+              <strong>1. Покупаешь в магазине-партнёре</strong><br>
+              260 000+ магазинов — онлайн и офлайн
+              <br><br>
+              <strong>2. Платишь частями без переплат</strong><br>
+              До 24 месяцев, без процентов и скрытых платежей
+              <br><br>
+              <strong>3. Следишь за рассрочками в приложении</strong><br>
+              Всё в одном месте — платежи, история, магазины
+              <br><br>
+              Кнопка: «Всё понятно, продолжить»
+            </div>
+            <div class="audit-note">Один экран закрывает главный страх и объясняет ценность продукта</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- SUMMARY -->
+<div class="task-section" id="summary">
+  <div class="container">
+    <div class="task-eyebrow reveal">Итог</div>
+    <h2 class="reveal">Что нашла</h2>
+
+    <div class="summary-row reveal">
+      <div class="summary-card">
+        <div class="summary-num red">3</div>
+        <div class="summary-label">Критических проблемы</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-num orange">2</div>
+        <div class="summary-label">Средних проблемы</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-num yellow">1</div>
+        <div class="summary-label">Мелкое замечание</div>
+      </div>
+    </div>
+
+    <div class="thinking reveal">
+      <div class="thinking-title">Главный вывод</div>
+      <p>Онбординг «Халвы» технически работает — пользователь успешно регистрируется. Но он решает задачу банка, а не пользователя. Наташа пришла с вопросом «это безопасно и как это работает?» — и ушла с тем же вопросом, просто с активированной картой в кармане.</p>
+      <p>Критическая проблема — не в отдельных формулировках, а в отсутствии объяснения продукта на входе. Рассрочка — нестандартный финансовый инструмент, и онбординг должен это учитывать. Один дополнительный экран с объяснением механики изменил бы ситуацию кардинально.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PROCESS -->
+<div class="process-section" id="process">
+  <div class="container">
+    <div class="task-eyebrow reveal">Разбор</div>
+    <h2 class="reveal">Как я думала над аудитом</h2>
+    <div class="process-items reveal">
+      <div class="process-item">
+        <div class="process-item-label">Сначала — персона, потом — экраны</div>
+        <div class="process-item-body">
+          Я прошла онбординг не как редактор, а как конкретный пользователь — Наташа, которая видела рекламу и пришла разобраться. <strong>Это сразу изменило приоритеты:</strong> технические проблемы с формулировками стали менее важны, чем отсутствие объяснения продукта.
+        </div>
+      </div>
+      <div class="process-item">
+        <div class="process-item-label">Искала несоответствие задачи и решения</div>
+        <div class="process-item-body">
+          Главный вопрос аудита: «Решает ли каждый экран задачу пользователя на этом шаге?» Не «красиво ли написано» — а <strong>«закрывает ли текст вопрос или страх, который есть у человека прямо сейчас».</strong> Именно этот подход выявил критическую проблему — отсутствие объяснения продукта.
+        </div>
+      </div>
+      <div class="process-item">
+        <div class="process-item-label">Разделила по критичности</div>
+        <div class="process-item-body">
+          Не все проблемы одинаковы. Отсутствие объяснения продукта и слоган вместо ценностного предложения — это критично, они напрямую влияют на конверсию. <strong>Поучительный тон на экране пин-кода — это средне,</strong> он портит опыт, но не убивает регистрацию. Это помогает команде расставить приоритеты.
+        </div>
+      </div>
+      <div class="process-item">
+        <div class="process-item-label">Каждая находка — с конкретным решением</div>
+        <div class="process-item-body">
+          Аудит без предложений — это список жалоб. <strong>Каждую проблему я сопроводила конкретным текстом и объяснением логики.</strong> Команда может взять предложение как есть или адаптировать под свой ToV — но у неё есть точка отсчёта.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="case-cta">
+  <div class="container">
+    <p>Понравился кейс? Посмотрите другие работы или напишите мне</p>
+    <div class="cta-btns">
+      <a href="index.html#cases" class="cta-btn-secondary">Все кейсы</a>
+      <a href="https://t.me/mashakazak" class="cta-btn-primary">Написать в Telegram</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-name">Маша Казак</div>
+      <div class="footer-sub">UX-редактор · Москва</div>
+    </div>
+    <div class="footer-contacts">
+      <a href="mailto:Cassaque@gmail.com" class="footer-contact">Cassaque@gmail.com</a>
+      <a href="https://t.me/mashakazak" class="footer-contact">@mashakazak</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 10));
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+  }, { threshold: 0.07 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
